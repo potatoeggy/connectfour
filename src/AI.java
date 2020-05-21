@@ -40,10 +40,18 @@ public class AI {
                         else p++;
                     }
                     for (int j = 0; j < 8; j++) {
-                        if (curr.x + xM[j] >= 0 &&)
+                        if (curr.x + xM[j] >= 0 && curr.x + xM[j] < b.H && curr.y + yM[j] >= 0 && curr.y + yM[j] < b.W && board[x + xM[j]][y + yM[j]] != 0 && !visited[curr.x + xM[j]][curr.y + yM[j]]) {
+                            if (curr.color != board[curr.x + xM[j]][curr.y + yM[j]]) {
+                                q.add(new coordinate(curr.x + xM[j], curr.y + yM[j], board[curr.x + xM[j]][curr.y + yM[j]], 0));
+                                visited[curr.x + xM[j]][curr.y + yM[j]] = true;
+                            } else {
+                                q.add(new coordinate(curr.x + xM[j], curr.y + yM[j], curr.color, curr.rowSize + 1));
+                            }
+                        }
                     }
                 }
             }
+            return rowSize * (ai - player);
         }
     }
 
