@@ -30,6 +30,7 @@ public class AI {
                 visited[b.H - 1][i] = true;
                 while (!q.isEmpty()) {
                     coordinate curr = q.poll();
+                    if (curr.x == 5 && curr.y == 4) System.out.println(true);
                     if (curr.rowSize > rowSize) {
                         ai = 0;
                         p = 0;
@@ -51,7 +52,7 @@ public class AI {
                             if (curr.color != board[curr.x + xM[j]][curr.y + yM[j]]) {
                                 q.add(new coordinate(curr.x + xM[j], curr.y + yM[j], board[curr.x + xM[j]][curr.y + yM[j]], 1));
                             } else {
-                                System.out.println("IN");
+                                System.out.println("IN" + curr.color);
                                 q.add(new coordinate(curr.x + xM[j], curr.y + yM[j], curr.color, curr.rowSize + 1));
                             }
                             visited[curr.x + xM[j]][curr.y + yM[j]] = true;
@@ -59,6 +60,7 @@ public class AI {
                     }
                 }
             }
+            System.out.println(rowSize + " " + ai + " " + p);
             return rowSize * (ai - p); //returns negative if player has more consecutive chips than AI
         }
     }
