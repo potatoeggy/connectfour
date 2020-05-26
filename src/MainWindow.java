@@ -23,7 +23,7 @@ public class MainWindow extends JFrame implements ActionListener {
     public void actionPerformed (ActionEvent event) {
         Object e = event.getSource();
         if (e.equals(newGameMenu.buttons[0])) {
-            System.out.println(0);
+            System.out.println(0); // TODO: make them do something
         } else if (e.equals(newGameMenu.buttons[1])) {
             System.out.println("1");
         } else if (e.equals(newGameMenu.buttons[2])) {
