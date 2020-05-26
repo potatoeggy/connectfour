@@ -3,9 +3,10 @@ public class Board {
     int[][] board = new int[H][W];
 
     public boolean checkWin(int x, int y, int player) {
-        int cL = 0, cU = 0, cRU = 0, cRD = 0;
+        if (board[x][y] != player) return false;
+        int cL = 1, cU = 1, cRU = 1, cRD = 1;
         boolean lF = false, rF = false, uF = false, dF = false, ruF = false, ldF = false, luF = false, rdF = false;
-        for (int i = 0; i <= H; i++) {
+        for (int i = 1; i <= H; i++) {
             if (!lF && y - i >= 0) {
                 if (board[x][y - i] == player) cL++;
                 else lF = true;
@@ -39,6 +40,8 @@ public class Board {
                 else luF = true;
             }
         }
+        /*System.out.println(cL + " " + cU + " " + cRD + " " + cRU);
+        System.out.println(x + "/" + y + " " + player);*/
         return cL >= 4 || cU >= 4 || cRD >= 4 || cRU >= 4;
     }
 
