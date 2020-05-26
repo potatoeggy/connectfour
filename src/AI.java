@@ -1,70 +1,70 @@
 import java.util.Arrays;
 import java.util.PriorityQueue;
 
-class coordinate implements Comparable<coordinate> {
+class Coordinate implements Comparable<Coordinate> {
     int x, y, color, rowSize,
-            xM, yM; //used to keep track which direction the row is
+            dirX, dirY; //used to keep track which direction the row is
 
-    coordinate(int x, int y, int color, int rowSize, int xM, int yM) {
+    Coordinate(int x, int y, int color, int rowSize, int dirX, int dirY) {
         this.x = x;
         this.y = y;
         this.color = color;
         this.rowSize = rowSize;
-        this.xM = xM;
-        this.yM = yM;
+        this.dirX = dirX;
+        this.dirY = dirY;
     }
 
     @Override
-    public int compareTo(coordinate o) {
-        if (this.x == o.x) return this.y - o.y;
-        return -1 * (this.x - o.x);
+    public int compareTo(Coordinate square) {
+        if (this.x == square.x) return this.y - square.y;
+        return -1 * (this.x - square.x);
     }
 }
 
 public class AI {
     static int scoreGen(int[][] board, int x, int y, int player) {
-        Board b = new Board();
-        b.board = board;
+        Board newBoard = new Board();
+        newBoard.board = board;
 
-        if (b.checkWin(x, y, player)) { //if this is a winning move
+        if (newBoard.checkWin(x, y, player)) { //if this is a winning move
             if (player == 1) return Integer.MAX_VALUE; //if AI wins
             return Integer.MIN_VALUE; //if player wins
         } else { //counts the largest amount of consecutive chips for each player
-            int ai = 0, p = 0, rowSize = 0;
-            final int xM[] = {0, -1, -1, -1}, yM[] = {1, 0, 1, -1}; //directions
+            int cpuPoints = 0, playerPoints = 0, rowSize = 0;
+            final int dirX[] = {0, -1, -1, -1}, dirY[] = {1, 0, 1, -1}; //directions
 
-            for (int i = 0; i < b.W; i++) { //loops through all columns in case there is a gap
-                PriorityQueue<coordinate> q = new PriorityQueue<>();
-                if (board[b.H - 1][i] == 0) continue; //if this place is empty
+            for (int i = 0; i < newBoard.W; i++) { //loops through all columns in case there is a gap
+                PriorityQueue<Coordinate> queue = new PriorityQueue<>();
+                if (board[newBoard.H - 1][i] == 0) continue; //if this place is empty
 
                 //starting position direction is 0, 0 to differentiate
-                q.add(new coordinate(b.H - 1, i, board[b.H - 1][i], 1, 0, 0));
+                queue.add(new Coordinate(newBoard.H - 1, i, board[newBoard.H - 1][i], 1, 0, 0));
 
-                while (!q.isEmpty()) {
-                    coordinate curr = q.poll();
+                while (!queue.isEmpty()) {
+                    Coordinate curr = queue.poll();
 
                     if (curr.rowSize > rowSize) { //checks if the chip's rowSize is larger than the largest row size
-                        ai = 0;
-                        p = 0; //set their count to 0
+                        cpuPoints = 0;
+                        playerPoints = 0; //set their count to 0
                         rowSize = curr.rowSize;
                     }
                     if (curr.rowSize == rowSize) { //or if it is equal to the largest row size
-                        if (curr.color == 1) ai++;
-                        else p++;
+                        if (curr.color == 1) cpuPoints++;
+                        else playerPoints++;
                     }
 
                     for (int j = 0; j < 4; j++) { //loops through all 4 directions
-                        if (curr.x + xM[j] >= 0 && curr.x + xM[j] < b.H && curr.y + yM[j] >= 0 && curr.y + yM[j] < b.W
-                                && board[curr.x + xM[j]][curr.y + yM[j]] != 0) {
+                        if (curr.x + dirX[j] >= 0 && curr.x + dirX[j] < newBoard.H && curr.y + dirY[j] >= 0 && curr.y + dirY[j] < newBoard.W
+                                && board[curr.x + dirX[j]][curr.y + dirY[j]] != 0) {
 
-                            if (curr.color != board[curr.x + xM[j]][curr.y + yM[j]]) { //if it's a different color
-                                q.add(new coordinate(curr.x + xM[j], curr.y + yM[j], board[curr.x + xM[j]][curr.y + yM[j]], 1, xM[j], yM[j]));
+                            if (curr.color != board[curr.x + dirX[j]][curr.y + dirY[j]]) { //if it's a different color
+                                queue.add(new Coordinate(curr.x + dirX[j], curr.y + dirY[j], board[curr.x + dirX[j]][curr.y + dirY[j]], 1, dirX[j], dirY[j]));
                             } else { //if it is the same color
                                 //if the row direction is the same or if it came from the starting position
-                                if ((xM[j] == curr.xM && yM[j] == curr.yM) || curr.yM == 0 && curr.xM == 0) {
-                                    q.add(new coordinate(curr.x + xM[j], curr.y + yM[j], curr.color, curr.rowSize + 1, xM[j], yM[j]));
+                                if ((dirX[j] == curr.dirX && dirY[j] == curr.dirY) || curr.dirY == 0 && curr.dirX == 0) {
+                                    queue.add(new Coordinate(curr.x + dirX[j], curr.y + dirY[j], curr.color, curr.rowSize + 1, dirX[j], dirY[j]));
                                 } else { //direction not the same
-                                    q.add(new coordinate(curr.x + xM[j], curr.y + yM[j], curr.color, 1, xM[j], yM[j]));
+                                    queue.add(new Coordinate(curr.x + dirX[j], curr.y + dirY[j], curr.color, 1, dirX[j], dirY[j]));
                                 }
                             }
                         }
@@ -72,7 +72,7 @@ public class AI {
                 }
             }
             //returns negative if player has more consecutive chips than AI
-            return rowSize * (ai - p);
+            return rowSize * (cpuPoints - playerPoints);
         }
     }
 
