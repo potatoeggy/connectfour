@@ -6,7 +6,7 @@ import java.util.StringTokenizer;
 public class test {
     public static void main(String[] args) throws IOException {
         int board[][] = new int[6][7];
-        board[5][4] = board[4][4] = board[3][4] = 1; //4
+        //board[5][4] = board[4][4] = board[3][4] = 1; //4
         board[5][4 - 1] = board[4][4 - 1] = board[3][4 - 1] = 2; //3
         board[5][4 - 2] = board[4][4 - 2] = board[3][4 - 2] = 2; //2
         System.out.println(board[4][4]);
