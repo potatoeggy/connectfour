@@ -70,8 +70,49 @@ public class AI {
                     }
                 }
             }
-            return rowSize * (ai - p); //returns negative if player has more consecutive chips than AI
+            //returns negative if player has more consecutive chips than AI
+            return rowSize * (ai - p);
         }
     }
 
+    static int[] minMax(Board board, int depth, int player) {
+        int ans[] = new int[7]; //best answer for current player
+
+        for (int i = 0; i < board.W; i++) {
+            Board b = new Board(); //copy of board
+            int value[]; //value of each move
+            b.board = board.board;
+
+            int x = nextEmpty(b, i); //next empty spot in column i
+            if (x == -1) continue; //if out of empty spaces continue
+            b.board[x][i] = player; //try the position
+
+            //recur until depth is 0
+            if (depth != 0) {
+                value = minMax(b, depth - 1, ((player - 1) ^ 1) + 1);
+                if (player == 1) { //AI player - find largest value
+                    int max = Integer.MIN_VALUE;
+                    for (int j : value) {
+                        max = Math.max(max, j);
+                    }
+                    ans[i] = max;
+                } else { //Player - find smallest value
+                    int min = Integer.MAX_VALUE;
+                    for (int j : value) {
+                        min = Math.min(min, j);
+                    }
+                    ans[i] = min;
+                }
+            } else ans[i] = scoreGen(b.board, x, i, player); //generate score for moves
+        }
+        return ans;
+    }
+
+    //utility function to find next empty position in a column
+    static int nextEmpty(Board board, int col) {
+        for (int i = board.H; i >= 0; i--) {
+            if (board.board[i][col] == 0) return i;
+        }
+        return -1;
+    }
 }

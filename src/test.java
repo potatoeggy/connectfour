@@ -10,7 +10,6 @@ public class test {
         board[3][4] = 2;
         board[5][4 - 1] = board[4][4 - 1] = board[3][4 - 1] = 2; //3
         board[5][4 - 2] = board[4][4 - 2] = board[3][4 - 2] = 2; //2
-        System.out.println(board[4][4]);
         System.out.println(AI.scoreGen(board, 2, 4, 1));
     }
 
