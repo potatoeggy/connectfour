@@ -8,6 +8,7 @@ import javax.swing.*;
 public class MainWindow extends JFrame implements ActionListener {
 	private NewGameMenu newGameMenu;
 	private MainMenu mainMenu;
+	private OptionsMenu optionsMenu; // TODO: what is an options menu
 	public MainWindow() {
 		newGameMenu = new NewGameMenu(this);
 		mainMenu = new MainMenu(this);
@@ -21,19 +22,23 @@ public class MainWindow extends JFrame implements ActionListener {
 		getRootPane().setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // make margins so it's nicer to use
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Connect 4");
-		transition(newGameMenu, mainMenu);
+		transition(mainMenu);
 	}
 
 	private void transition(JPanel toRemove, JPanel toAdd) { // enables and disables panels as necessary
+		// delete panel
+		toRemove.setVisible(false);
+	}
+
+	private void transition(JPanel toAdd) { // enables panels
 		// resize the frame
 		if (toAdd.equals(mainMenu)) {
 			setSize(300, 200);
 		} else if (toAdd.equals(newGameMenu)) {
 			setSize(800, 300);
 		}
-		
-		// make panels change
-		toRemove.setVisible(false);
+
+		// make things appear
 		toAdd.setVisible(true);
 	}
 
@@ -53,7 +58,6 @@ public class MainWindow extends JFrame implements ActionListener {
 		else if (e.equals(newGameMenu.buttons[0])) {
 			System.out.println(0); // TODO: make them do something
 		} else if (e.equals(newGameMenu.buttons[1])) {
-			System.out.println("1");
 		} else if (e.equals(newGameMenu.buttons[2])) {
 			transition(newGameMenu, mainMenu);
 		}
