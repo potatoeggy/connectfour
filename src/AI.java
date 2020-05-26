@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.PriorityQueue;
 
 class coordinate implements Comparable<coordinate> {
@@ -79,13 +80,17 @@ public class AI {
         int ans[] = new int[7]; //best answer for current player
 
         for (int i = 0; i < board.W; i++) {
+            System.out.println(player);
             Board b = new Board(); //copy of board
             int value[]; //value of each move
-            b.board = board.board;
+            b.board = new int[b.H][b.W];
+            for (int j = 0; j < b.H; j++) b.board[j] = Arrays.copyOf(board.board[j], b.W);
 
             int x = nextEmpty(b, i); //next empty spot in column i
             if (x == -1) continue; //if out of empty spaces continue
             b.board[x][i] = player; //try the position
+
+            test.printBoard(b);
 
             //recur until depth is 0
             if (depth != 0) {
@@ -103,16 +108,20 @@ public class AI {
                     }
                     ans[i] = min;
                 }
-            } else ans[i] = scoreGen(b.board, x, i, player); //generate score for moves
+            } else {
+                System.out.println("end");
+                ans[i] = scoreGen(b.board, x, i, player);
+            } //generate score for moves
         }
         return ans;
     }
 
     //utility function to find next empty position in a column
     static int nextEmpty(Board board, int col) {
-        for (int i = board.H; i >= 0; i--) {
+        for (int i = board.H - 1; i >= 0; i--) {
             if (board.board[i][col] == 0) return i;
         }
         return -1;
     }
+
 }
