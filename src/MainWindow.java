@@ -35,17 +35,9 @@ public class MainWindow extends JFrame implements ActionListener {
 	}
 
 	private void transition(JPanel toAdd) { // enables panels
-		// resize the frame
-		if (toAdd.equals(mainMenu)) {
-			setSize(300, 250);
-		} else if (toAdd.equals(newGameMenu)) {
-			setSize(725, 250);
-		} else if (toAdd.equals(optionsMenu)) {
-			setSize(400, 250);
-		}
-
 		// make things appear
 		toAdd.setVisible(true);
+		pack();
 	}
 
 	public void actionPerformed(ActionEvent event) { // global event handler (mostly used for panel transition)

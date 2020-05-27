@@ -52,7 +52,7 @@ public class NewGameMenu extends JPanel {
 		}
 
 		// provide options for user to play against
-		for (String s : new String[] {"Human", "Computer (very easy)", "Computer (easy)", "Computer (hard)", "Computer (impossible)"}) {
+		for (String s : new String[] {"Human", "Computer"}) {
 			for (JComboBox<String> cb : playerSelect) { // provide options for both boxes
 				cb.addItem(s);
 			}

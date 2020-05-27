@@ -37,6 +37,7 @@ public class OptionsMenu extends JPanel implements ActionListener { // how do di
 		}) {
 			difficultySelect.addItem(s);
 		}
+		difficultySelect.setSelectedItem("Normal");
 
 		for (String s : new String[] { // add options to timer box
 			"5 seconds",
@@ -47,6 +48,7 @@ public class OptionsMenu extends JPanel implements ActionListener { // how do di
 		}) {
 			moveTimerSelect.addItem(s);
 		}
+		moveTimerSelect.setSelectedItem("10 seconds");
 
 		title.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 		add(title);
@@ -64,7 +66,7 @@ public class OptionsMenu extends JPanel implements ActionListener { // how do di
 
 		fakeGrid[2].add(labels[2]);
 		fakeGrid[2].add(moveTimerSelect);
-		moveTimerSelect.setVisible(false); // invisible by default because the move timer is off by default
+		moveTimerSelect.setEnabled(false); // invisible by default because the move timer is off by default
 
 		fakeGrid[3].add(okButton);
 		okButton.addActionListener(eventHandler); // pass it back because it requires panel switching
@@ -76,7 +78,7 @@ public class OptionsMenu extends JPanel implements ActionListener { // how do di
 	public void actionPerformed(ActionEvent event) {
 		Object e = event.getSource();
 		if (e.equals(moveTimerEnabler)) {
-			moveTimerSelect.setVisible(moveTimerEnabler.isSelected()); // i hope isSelected does what i think it does
+			moveTimerSelect.setEnabled(moveTimerEnabler.isSelected()); // i hope isSelected does what i think it does
 		}
 	} // end actionPerformed
 }
