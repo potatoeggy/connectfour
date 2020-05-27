@@ -11,8 +11,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class MainMenu extends JPanel {
-	private JLabel title;
-	JButton[] buttons;
+	private JLabel title; // label at top as a header
+	JButton[] buttons; // interactable buttons
 
 	public MainMenu(ActionListener eventHandler) {
 		title = new JLabel("Connect 4");
@@ -22,10 +22,11 @@ public class MainMenu extends JPanel {
 		add(title);
 		title.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 		for (JButton butt : buttons) {
-			butt.addActionListener(eventHandler);
-			add(Box.createVerticalStrut(10));
+			butt.addActionListener(eventHandler); // pass button clicks to the main window manager
+			add(Box.createVerticalStrut(10)); // spacing for prettiness
 			add(butt);
 			butt.setAlignmentX(JButton.CENTER_ALIGNMENT);
 		}
-	}
+		setVisible(false); // invisible by default
+	} // end constructor
 }
