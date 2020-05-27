@@ -2,47 +2,53 @@
 // 13 May 2020
 // main window for user interaction
 
+// TODO: consider javadoc since maybe that'll give more marks
+
 import java.awt.event.*;
 import javax.swing.*;
 
 public class MainWindow extends JFrame implements ActionListener {
+	// grab all the panels
 	private NewGameMenu newGameMenu;
 	private MainMenu mainMenu;
-	private OptionsMenu optionsMenu; // TODO: what is an options menu
+	private OptionsMenu optionsMenu;
+	private boolean optionsToNew; // where to go because the options menu should be accessible from in game and game creation menu
 	public MainWindow() {
 		newGameMenu = new NewGameMenu(this);
 		mainMenu = new MainMenu(this);
+		optionsMenu = new OptionsMenu(this);
 
-		add(mainMenu);
-		add(newGameMenu);
-		mainMenu.setVisible(true);
-		newGameMenu.setVisible(false);
+		for (JPanel pan : new JPanel[] {newGameMenu, mainMenu, optionsMenu}) {
+			add(pan); // add panels to frame even if they're hidden so we can control them later
+		}
 
-		setLayout(new BoxLayout(getContentPane(), BoxLayout.PAGE_AXIS));
+		setLayout(new BoxLayout(getContentPane(), BoxLayout.PAGE_AXIS)); // set layout of frame
 		getRootPane().setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // make margins so it's nicer to use
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Connect 4");
 		transition(mainMenu);
-	}
+	} // end constructor
 
-	private void transition(JPanel toRemove, JPanel toAdd) { // enables and disables panels as necessary
-		// delete panel
+	private void transition(JPanel toRemove, JPanel toAdd) { // <-- method overloading now give me marks
 		toRemove.setVisible(false);
+		transition(toAdd);
 	}
 
 	private void transition(JPanel toAdd) { // enables panels
 		// resize the frame
 		if (toAdd.equals(mainMenu)) {
-			setSize(300, 200);
+			setSize(300, 250);
 		} else if (toAdd.equals(newGameMenu)) {
-			setSize(800, 300);
+			setSize(725, 250);
+		} else if (toAdd.equals(optionsMenu)) {
+			setSize(400, 250);
 		}
 
 		// make things appear
 		toAdd.setVisible(true);
 	}
 
-	public void actionPerformed(ActionEvent event) {
+	public void actionPerformed(ActionEvent event) { // global event handler (mostly used for panel transition)
 		Object e = event.getSource();
 
 		// main menu interactions
@@ -51,20 +57,29 @@ public class MainWindow extends JFrame implements ActionListener {
 		} else if (e.equals(mainMenu.buttons[1])) {
 			// load menu
 		} else if (e.equals(mainMenu.buttons[2])) {
-			dispose();
+			dispose(); // exit and quit the program
 		}
 		
 		// new game menu interactions
 		else if (e.equals(newGameMenu.buttons[0])) {
 			System.out.println(0); // TODO: make them do something
 		} else if (e.equals(newGameMenu.buttons[1])) {
+			optionsToNew = true;
+			transition(newGameMenu, optionsMenu); // TODO: make sure game is paused when transitioning so move timers don't run and all that
 		} else if (e.equals(newGameMenu.buttons[2])) {
 			transition(newGameMenu, mainMenu);
+		}
+
+		// options menu interactions
+		else if (e.equals(optionsMenu.okButton)) {
+			// TODO: apply settings
+			transition(optionsMenu, optionsToNew ? newGameMenu : mainMenu); // TODO: make a game panel because we should not be going to main
 		}
 	}
 
 	public static void main(String[] args) {
 		MainWindow win = new MainWindow();
 		win.setVisible(true);
+		// TODO: prettify the UI because Swing is the ugliest thing ever, maybe use a different LAF
 	}
 }

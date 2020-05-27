@@ -16,7 +16,7 @@ import javax.swing.JTextField;
 
 public class NewGameMenu extends JPanel {
 	private JPanel playerBox; // panels used to hold things
-	private JLabel title; // "Connect 4" header
+	private JLabel title; // header
 	private JLabel[] nameLabels, playerLabels; // instructions for user interaction
 	private JComboBox<String>[] playerSelect; // select player
 	private JTextField[] nameSelect; // select name
@@ -25,7 +25,7 @@ public class NewGameMenu extends JPanel {
 	public NewGameMenu(ActionListener eventHandler) {
 		// create all objects for frame menu
 		playerBox = new JPanel();
-		title = new JLabel("Connect 4");
+		title = new JLabel("Create New Game");
 		nameLabels = new JLabel[] {new JLabel("Name: "), new JLabel("Name: ")};
 		playerLabels = new JLabel[] {new JLabel("Player type: "), new JLabel("Player type: ")};
 		playerSelect = new JComboBox[] {new JComboBox<String>(), new JComboBox<String>()};
@@ -40,7 +40,7 @@ public class NewGameMenu extends JPanel {
 		for (JButton butt : buttons) { // add all buttons and make them do something
 			butt.setAlignmentX(JButton.CENTER_ALIGNMENT);
 			butt.addActionListener(eventHandler);
-			add(Box.createVerticalStrut(10));
+			add(Box.createVerticalStrut(10)); // provide spacing to make it look nicer
 			add(butt);
 		}
 
@@ -53,9 +53,10 @@ public class NewGameMenu extends JPanel {
 
 		// provide options for user to play against
 		for (String s : new String[] {"Human", "Computer (very easy)", "Computer (easy)", "Computer (hard)", "Computer (impossible)"}) {
-			for (JComboBox<String> cb : playerSelect) {
+			for (JComboBox<String> cb : playerSelect) { // provide options for both boxes
 				cb.addItem(s);
 			}
 		}
+		setVisible(false); // set invisible by default as visibility should be handed by main
 	}
 }
