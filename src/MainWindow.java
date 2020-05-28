@@ -21,11 +21,13 @@ public class MainWindow extends JFrame implements ActionListener {
 	private OptionsMenu optionsMenu;
 	private GameWindow gameWindow;
 	private boolean optionsToNew; // where to go because the options menu should be accessible from in game and game creation menu
+	private Board board;
 	public MainWindow() {
 		newGameMenu = new NewGameMenu(this);
 		mainMenu = new MainMenu(this);
 		optionsMenu = new OptionsMenu(this);
-		gameWindow = new GameWindow(this);
+		board = new Board();
+		gameWindow = new GameWindow(this, board);
 
 		for (JPanel pan : new JPanel[] {newGameMenu, mainMenu, optionsMenu, gameWindow}) {
 			add(pan); // add panels to frame even if they're hidden so we can control them later

@@ -13,7 +13,11 @@ public class GameWindow extends JPanel implements ActionListener {
 	JButton optionsButton;
 	private JLabel gameStatus, moveTimer;
 	private JButton[][] buttonGrid = new JButton[7][7];
-	public GameWindow(ActionListener eventHandler) {
+	private int currentPlayer = 0;
+	private Board board;
+	private ImageIcon arrow;
+	public GameWindow(ActionListener eventHandler, Board board) {
+		this.board = board;
 		header = new JPanel();
 		headerJustification = new JPanel[] {new JPanel(), new JPanel(), new JPanel()};
 		body = new JPanel();
@@ -21,6 +25,7 @@ public class GameWindow extends JPanel implements ActionListener {
 		optionsButton = new JButton("Options");
 		gameStatus = new JLabel("temporary header");
 		moveTimer = new JLabel("temporary move timer");
+		arrow = new ImageIcon("resources/arrow.png");
 
 		for (JButton butt : headerButtons) {
 			headerJustification[0].add(butt);
@@ -51,12 +56,14 @@ public class GameWindow extends JPanel implements ActionListener {
 				buttonGrid[i][j].addMouseListener(new MouseAdapter() {
 					public void mouseEntered(MouseEvent event) {
 						int y = (Integer) (((JButton) event.getSource()).getClientProperty("y"));
-						buttonGrid[0][y].setBackground(Color.GRAY);
+						buttonGrid[0][y].setIcon(arrow);
+						revalidate();
+						repaint();
 					}
 
 					public void mouseExited(MouseEvent event) {
 						int y = (Integer) (((JButton) event.getSource()).getClientProperty("y"));
-						buttonGrid[0][y].setBackground(Color.WHITE);
+						buttonGrid[0][y].setIcon(null);
 					}
 				});
 				body.add(buttonGrid[i][j]);
@@ -73,6 +80,9 @@ public class GameWindow extends JPanel implements ActionListener {
 	}
 
 	public void actionPerformed(ActionEvent event) { // this is going to contain a lot of stuff too
-
+		// this is temporary since the board class should be updated to handle column only things
+		int x = (Integer) (((JButton) event.getSource()).getClientProperty("x"));
+		int y = (Integer) (((JButton) event.getSource()).getClientProperty("y"));
+		board.addChip(x, y, currentPlayer);
 	}
 }
