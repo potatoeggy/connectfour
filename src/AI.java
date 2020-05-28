@@ -5,8 +5,9 @@ import java.util.PriorityQueue;
 class coordinate implements Comparable<coordinate> {
     int x, y, color, rowSize, xBegin, yBegin,
             xM, yM; //used to keep track which direction the row is
+    boolean startBlocked; //if the starting end is blocked - false
 
-    coordinate(int x, int y, int color, int rowSize, int xM, int yM, int xBegin, int yBegin) {
+    coordinate(int x, int y, int color, int rowSize, int xM, int yM, int xBegin, int yBegin, boolean startBlocked) {
         this.x = x;
         this.y = y;
         this.color = color;
@@ -15,6 +16,7 @@ class coordinate implements Comparable<coordinate> {
         this.yM = yM;
         this.xBegin = xBegin;
         this.yBegin = yBegin;
+        this.startBlocked = startBlocked;
     }
 
     @Override //sorted so it iterates through bottom left to top right - row by row
@@ -25,8 +27,10 @@ class coordinate implements Comparable<coordinate> {
 }
 
 public class AI {
+
+    static Board b = new Board();
+
     static int scoreGen(int[][] board) {
-        Board b = new Board();
         b.board = board;
 
         //test.printBoard(b);
@@ -47,13 +51,16 @@ public class AI {
 
         //array to keep track of which rows are already counted
         ArrayList<Integer[]> foundRows = new ArrayList<>();
+        int xStart, yStart;
 
         for (int i = 0; i < b.W; i++) { //loops through all columns in case there is a gap
             PriorityQueue<coordinate> q = new PriorityQueue<>();
             if (board[b.H - 1][i] == 0) continue; //if this place is empty
 
             //starting position
-            q.add(new coordinate(b.H - 1, i, board[b.H - 1][i], 1, 0, 0, 0, 0));
+            q.add(new coordinate(b.H - 1, i, board[b.H - 1][i], 1, 0, 0, 5, i, false));
+            xStart = 5;
+            yStart = i;
 
             while (!q.isEmpty()) {
                 coordinate curr = q.poll();
@@ -61,14 +68,24 @@ public class AI {
                 //find the correct color
                 int color = (curr.color % 10) == 0 ? curr.color / 10 : curr.color % 10;
 
+                //ending is unblocked?
+                int trueRowSize = curr.startBlocked ? 1 : 0;
+                if (curr.x + curr.xM >= 0 && curr.x + curr.xM < b.H && curr.y + curr.yM >= 0 && curr.y + curr.yM < b.W && board[curr.x + curr.xM][curr.y + curr.yM] == 0) {
+                    trueRowSize++;
+                }
+                trueRowSize = trueRowSize * curr.rowSize; //for each unblocked end, multiply score
+
                 //checks if the chip's rowSize is larger than the largest row size
-                if (curr.rowSize > rowSize && curr.color < 3) {
+                if (trueRowSize > rowSize && curr.color < 3) {
+                    System.out.println(trueRowSize);
                     ai = 0;
                     p = 0; //set their count to 0
-                    rowSize = curr.rowSize;
+                    rowSize = trueRowSize;
                 }
                 //or if it is equal to the largest row size
-                if (curr.rowSize == rowSize && curr.color < 3) {
+                if (trueRowSize == rowSize && curr.color < 3) {
+                    System.out.println(curr.x + "!" + curr.y + " " + curr.xBegin + "/" + curr.yBegin);
+                    System.out.println(color);
                     //checks if the row was already counted
                     Integer[] beginEnd = {curr.xBegin, curr.yBegin, curr.x, curr.y};
                     boolean found = false;
@@ -89,24 +106,33 @@ public class AI {
                     if (curr.x + xM[j] >= 0 && curr.x + xM[j] < b.H && curr.y + yM[j] >= 0 && curr.y + yM[j] < b.W) {
                         if (board[curr.x + xM[j]][curr.y + yM[j]] != 0) { //if this position is not empty
                             if (color != board[curr.x + xM[j]][curr.y + yM[j]]) { //if it's a different color
-                                q.add(new coordinate(curr.x + xM[j], curr.y + yM[j], board[curr.x + xM[j]][curr.y + yM[j]], 1, xM[j], yM[j], curr.x + xM[j], curr.y + yM[j]));
+                                q.add(new coordinate(curr.x + xM[j], curr.y + yM[j], board[curr.x + xM[j]][curr.y + yM[j]], 1, xM[j], yM[j], curr.x + xM[j], curr.y + yM[j], false));
                             } else { //if it is the same color
                                 //if the row direction is the same or if it came from the starting position
-                                if ((xM[j] == curr.xM && yM[j] == curr.yM) || curr.yM == 0 && curr.xM == 0) {
-                                    q.add(new coordinate(curr.x + xM[j], curr.y + yM[j], color, curr.rowSize + 1, xM[j], yM[j], curr.xBegin, curr.yBegin));
-                                } else { //direction not the same
-                                    q.add(new coordinate(curr.x + xM[j], curr.y + yM[j], color, 1, xM[j], yM[j], curr.x + xM[j], curr.y + yM[j]));
-                                }
+                                if ((xM[j] == curr.xM && yM[j] == curr.yM) || curr.yM == yStart && curr.xM == xStart) {
+                                    boolean start = curr.startBlocked;
+                                    if (curr.yM == yStart && curr.xM == xStart && j == 0) { //if horizontal direction is unblocked
+                                        start = startBlocked(curr.x, curr.y, xM[j], yM[j]);
+                                    }
+
+                                    q.add(new coordinate(curr.x + xM[j], curr.y + yM[j], color, curr.rowSize + 1, xM[j], yM[j], curr.xBegin, curr.yBegin, start));
+                                } else  //direction not the same
+                                    q.add(new coordinate(curr.x + xM[j], curr.y + yM[j], color, 1, xM[j], yM[j], curr.x + xM[j], curr.y + yM[j], startBlocked(curr.x + xM[j], curr.y + yM[j], xM[j], yM[j])));
                             }
                         }
                         //if there is a gap in the middle of a row
-                        else if (curr.color < 3)
-                            q.add(new coordinate(curr.x + xM[j], curr.y + yM[j], color * 10, curr.rowSize, xM[j], yM[j], curr.xBegin, curr.yBegin));
+                        else if (curr.color < 3) {
+                            boolean start = curr.startBlocked;
+                            if (curr.yM == yStart && curr.xM == xStart && j == 0) { //if horizontal direction is unblocked
+                                start = startBlocked(curr.x, curr.y, xM[j], yM[j]);
+                            }
+                            q.add(new coordinate(curr.x + xM[j], curr.y + yM[j], color * 10, curr.rowSize, xM[j], yM[j], curr.xBegin, curr.yBegin, start));
+                        }
                     }
                 }
             }
         }
-        //System.out.println(rowSize + " " + ai + " " + p);
+        System.out.println(rowSize + " " + ai + " " + p);
         //returns negative if player has more consecutive chips than AI
         return rowSize * (ai - p);
     }
@@ -158,4 +184,7 @@ public class AI {
         return -1;
     }
 
+    static boolean startBlocked(int x, int y, int xM, int yM) {
+        return x - xM >= 0 && x - xM < b.H && y - yM >= 0 && y - yM < b.W && b.board[x - xM][y - yM] == 0;
+    }
 }
