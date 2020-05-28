@@ -13,9 +13,16 @@ public class GameWindow extends JPanel implements ActionListener {
 	JButton optionsButton;
 	private JLabel gameStatus, moveTimer;
 	private JButton[][] buttonGrid = new JButton[7][7];
-	private int currentPlayer = 0;
-	private Board board;
 	private ImageIcon arrow;
+
+	// internal variables
+	private Board board;
+	private String[] players; // list of player names
+	private int currentPlayer; // corresponds to array index
+	private int cpuDifficulty; // 0-3 to pass to AI
+	private int moveTimerInternal; // how much time is left (if negative, infinite)
+	private int moveTimerFull; // what to reset timer to
+
 	public GameWindow(ActionListener eventHandler, Board board) {
 		this.board = board;
 		header = new JPanel();
@@ -68,6 +75,10 @@ public class GameWindow extends JPanel implements ActionListener {
 				});
 				body.add(buttonGrid[i][j]);
 			}
+		}
+
+		for (int i = 0; i < buttonGrid[0].length; i++) {
+			buttonGrid[0][i].setBorder(BorderFactory.createMatteBorder(0, 0, 0, 0, Color.WHITE));
 		}
 
 		add(header);
