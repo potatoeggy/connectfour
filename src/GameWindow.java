@@ -14,17 +14,10 @@ public class GameWindow extends JPanel implements ActionListener {
 	private JLabel gameStatus, moveTimer;
 	private JButton[][] buttonGrid = new JButton[7][7];
 	private ImageIcon arrow;
+	private MainWindow eventHandler;
 
-	// internal variables
-	private Board board;
-	private String[] players; // list of player names
-	private int currentPlayer; // corresponds to array index
-	private int cpuDifficulty; // 0-3 to pass to AI
-	private int moveTimerInternal; // how much time is left (if negative, infinite)
-	private int moveTimerFull; // what to reset timer to
-
-	public GameWindow(ActionListener eventHandler, Board board) {
-		this.board = board;
+	public GameWindow(MainWindow eventHandler, Board board) {
+		this.eventHandler = eventHandler;
 		header = new JPanel();
 		headerJustification = new JPanel[] {new JPanel(), new JPanel(), new JPanel()};
 		body = new JPanel();
@@ -51,7 +44,7 @@ public class GameWindow extends JPanel implements ActionListener {
 		headerJustification[1].setLayout(new FlowLayout(FlowLayout.CENTER));
 		headerJustification[2].setLayout(new FlowLayout(FlowLayout.RIGHT));
 
-		for (int i = 0; i < buttonGrid.length; i++) { // TODO: remove top border?
+		for (int i = 0; i < buttonGrid.length; i++) {
 			for (int j = 0; j < buttonGrid[i].length; j++) {
 				buttonGrid[i][j] = new JButton("<html><br><br><br><br><br><br></html>");
 				buttonGrid[i][j].addActionListener(this);
@@ -94,6 +87,6 @@ public class GameWindow extends JPanel implements ActionListener {
 		// this is temporary since the board class should be updated to handle column only things
 		int x = (Integer) (((JButton) event.getSource()).getClientProperty("x"));
 		int y = (Integer) (((JButton) event.getSource()).getClientProperty("y"));
-		board.addChip(x, y, currentPlayer);
+		eventHandler.getBoard().addChip(x, y, eventHandler.getCurrentPlayer());
 	}
 }

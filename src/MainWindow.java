@@ -21,13 +21,31 @@ public class MainWindow extends JFrame implements ActionListener {
 	private OptionsMenu optionsMenu;
 	private GameWindow gameWindow;
 	private boolean optionsToNew; // where to go because the options menu should be accessible from in game and game creation menu
+	
+	// internal game variables
 	private Board board;
+	private int[] players; // list of player types
+	private String[] names; // list of player names
+	private int currentPlayer; // corresponds to array index
+	private int cpuDifficulty; // 0-3 to pass to AI
+	private int moveTimerInternal; // how much time is left (if negative, infinite) (might be handled by main come to think of it because we need threading)
+	private int moveTimerFull; // what to reset timer to
+
+
 	public MainWindow() {
 		newGameMenu = new NewGameMenu(this);
 		mainMenu = new MainMenu(this);
 		optionsMenu = new OptionsMenu(this);
 		board = new Board();
 		gameWindow = new GameWindow(this, board);
+
+		// initialising internal variables
+		currentPlayer = 0;
+		cpuDifficulty = 1;
+		moveTimerInternal = -1;
+		moveTimerFull = -1;
+		players = new int[2];
+		names = new String[2];
 
 		for (JPanel pan : new JPanel[] {newGameMenu, mainMenu, optionsMenu, gameWindow}) {
 			add(pan); // add panels to frame even if they're hidden so we can control them later
@@ -59,7 +77,7 @@ public class MainWindow extends JFrame implements ActionListener {
 		if (e.equals(mainMenu.buttons[0])) {
 			transition(mainMenu, newGameMenu);
 		} else if (e.equals(mainMenu.buttons[1])) {
-			// import board settings
+			// TODO: import board settings
 			transition(mainMenu, gameWindow);
 		} else if (e.equals(mainMenu.buttons[2])) {
 			dispose(); // exit and quit the program
@@ -67,6 +85,8 @@ public class MainWindow extends JFrame implements ActionListener {
 		
 		// new game menu interactions
 		else if (e.equals(newGameMenu.buttons[0])) {
+			names = newGameMenu.getNames();
+			players = newGameMenu.getPlayers();
 			transition(newGameMenu, gameWindow); // TODO: add checks to make sure that the gamewindow is reset properly
 		} else if (e.equals(newGameMenu.buttons[1])) {
 			optionsToNew = true;
@@ -77,15 +97,26 @@ public class MainWindow extends JFrame implements ActionListener {
 
 		// options menu interactions
 		else if (e.equals(optionsMenu.okButton)) {
-			// TODO: apply settings
+			this.moveTimerFull = optionsMenu.getTimer();
+			this.cpuDifficulty = optionsMenu.getDifficulty();
 			transition(optionsMenu, optionsToNew ? newGameMenu : gameWindow);
+		}
+
+		// game window interactions
+		else if (e.equals(gameWindow.optionsButton)) {
+			// TODO: pause the game
+			optionsToNew = false;
+			transition(gameWindow, optionsMenu);
+		} else if (e.equals(gameWindow.headerButtons[0])) {
+			// TODO: save
+			transition(gameWindow, mainMenu);
+		} else if (e.equals(gameWindow.headerButtons[1])) {
+			// TODO: issue 11: maybe add confirmation dialog
+			transition(gameWindow, newGameMenu);
 		}
 	}
 
 	public static void main(String[] args) {
-		//UIManager.getLookAndFeelDefaults().put("Label.font", new Font("sans-serif", Font.BOLD, 24)); // make pretty
-		//UIManager.getLookAndFeelDefaults().put("Button.font", new Font("sans-serif", Font.BOLD, 14));
-		//UIManager.getLookAndFeelDefaults().put("TextField.font", new Font("sans-serif", Font.PLAIN, 14));
 		for (String s : new String[] {
 			"Label",
 			"Button",
@@ -97,5 +128,33 @@ public class MainWindow extends JFrame implements ActionListener {
 		MainWindow win = new MainWindow();
 		win.setVisible(true);
 		// TODO: prettify the UI because Swing is the ugliest thing ever, maybe use a different LAF
+	}
+
+	public int[] getPlayers() {
+		return this.players;
+	}
+
+	public String[] getNames() {
+		return this.names;
+	}
+
+	public Board getBoard() {
+		return this.board;
+	}
+
+	public int getCurrentPlayer() {
+		return this.currentPlayer;
+	}
+
+	public int getDifficulty() {
+		return this.cpuDifficulty;
+	}
+
+	public int getMaxTimer() {
+		return this.moveTimerFull;
+	}
+
+	public int getTimer() {
+		return this.moveTimerInternal;
 	}
 }
