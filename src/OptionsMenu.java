@@ -44,7 +44,7 @@ public class OptionsMenu extends JPanel implements ActionListener { // how do di
 			"10 seconds",
 			"20 seconds",
 			"30 seconds",
-			"1 minute"
+			"60 seconds"
 		}) {
 			moveTimerSelect.addItem(s);
 		}
