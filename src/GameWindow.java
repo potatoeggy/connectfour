@@ -9,13 +9,16 @@ import javax.swing.*;
 public class GameWindow extends JPanel implements ActionListener {
 	private JPanel header, body;
 	private JPanel[] headerJustification;
-	private JButton[] headerButtons;
+	JButton[] headerButtons;
+	JButton optionsButton;
 	private JLabel gameStatus, moveTimer;
+	private JButton[][] buttonGrid = new JButton[7][7];
 	public GameWindow(ActionListener eventHandler) {
 		header = new JPanel();
 		headerJustification = new JPanel[] {new JPanel(), new JPanel(), new JPanel()};
 		body = new JPanel();
-		headerButtons = new JButton[] {new JButton("Save and quit"), new JButton("New game"), new JButton("Options")};
+		headerButtons = new JButton[] {new JButton("Save and quit"), new JButton("New game")};
+		optionsButton = new JButton("Options");
 		gameStatus = new JLabel("temporary header");
 		moveTimer = new JLabel("temporary move timer");
 
@@ -25,6 +28,8 @@ public class GameWindow extends JPanel implements ActionListener {
 		}
 
 		headerJustification[1].add(gameStatus);
+		headerJustification[2].add(optionsButton);
+		optionsButton.addActionListener(eventHandler);
 		headerJustification[2].add(moveTimer);
 
 		for (JPanel pan : headerJustification) {
@@ -33,6 +38,30 @@ public class GameWindow extends JPanel implements ActionListener {
 		headerJustification[0].setLayout(new FlowLayout(FlowLayout.LEFT));
 		headerJustification[1].setLayout(new FlowLayout(FlowLayout.CENTER));
 		headerJustification[2].setLayout(new FlowLayout(FlowLayout.RIGHT));
+
+		for (int i = 0; i < buttonGrid.length; i++) { // TODO: remove top border?
+			for (int j = 0; j < buttonGrid[i].length; j++) {
+				buttonGrid[i][j] = new JButton("<html><br><br><br><br><br><br></html>");
+				buttonGrid[i][j].addActionListener(this);
+				buttonGrid[i][j].setBorder(BorderFactory.createLineBorder(Color.BLACK));
+				buttonGrid[i][j].putClientProperty("x", new Integer(i));
+				buttonGrid[i][j].putClientProperty("y", new Integer(j));
+				buttonGrid[i][j].setBackground(Color.WHITE);
+				buttonGrid[i][j].setFocusPainted(false);
+				buttonGrid[i][j].addMouseListener(new MouseAdapter() {
+					public void mouseEntered(MouseEvent event) {
+						int y = (Integer) (((JButton) event.getSource()).getClientProperty("y"));
+						buttonGrid[0][y].setBackground(Color.GRAY);
+					}
+
+					public void mouseExited(MouseEvent event) {
+						int y = (Integer) (((JButton) event.getSource()).getClientProperty("y"));
+						buttonGrid[0][y].setBackground(Color.WHITE);
+					}
+				});
+				body.add(buttonGrid[i][j]);
+			}
+		}
 
 		add(header);
 		add(body);

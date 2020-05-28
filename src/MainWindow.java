@@ -4,8 +4,15 @@
 
 // TODO: consider javadoc since maybe that'll give more marks
 
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.UIManager;
+import java.awt.*;
 
 public class MainWindow extends JFrame implements ActionListener {
 	// grab all the panels
@@ -25,7 +32,8 @@ public class MainWindow extends JFrame implements ActionListener {
 		}
 
 		setLayout(new BoxLayout(getContentPane(), BoxLayout.PAGE_AXIS)); // set layout of frame
-		getRootPane().setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // make margins so it's nicer to use
+		getRootPane().setBorder(BorderFactory.createLineBorder(Color.WHITE, 10)); // make margins so it's nicer to use
+		getContentPane().setBackground(Color.WHITE);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Connect 4");
 		transition(mainMenu);
@@ -73,6 +81,17 @@ public class MainWindow extends JFrame implements ActionListener {
 	}
 
 	public static void main(String[] args) {
+		//UIManager.getLookAndFeelDefaults().put("Label.font", new Font("sans-serif", Font.BOLD, 24)); // make pretty
+		//UIManager.getLookAndFeelDefaults().put("Button.font", new Font("sans-serif", Font.BOLD, 14));
+		//UIManager.getLookAndFeelDefaults().put("TextField.font", new Font("sans-serif", Font.PLAIN, 14));
+		for (String s : new String[] {
+			"Label",
+			"Button",
+			"ComboBox",
+			"Panel"
+		}) {
+			UIManager.getLookAndFeelDefaults().put(s + ".background", Color.WHITE);
+		}
 		MainWindow win = new MainWindow();
 		win.setVisible(true);
 		// TODO: prettify the UI because Swing is the ugliest thing ever, maybe use a different LAF
