@@ -12,13 +12,15 @@ public class MainWindow extends JFrame implements ActionListener {
 	private NewGameMenu newGameMenu;
 	private MainMenu mainMenu;
 	private OptionsMenu optionsMenu;
+	private GameWindow gameWindow;
 	private boolean optionsToNew; // where to go because the options menu should be accessible from in game and game creation menu
 	public MainWindow() {
 		newGameMenu = new NewGameMenu(this);
 		mainMenu = new MainMenu(this);
 		optionsMenu = new OptionsMenu(this);
+		gameWindow = new GameWindow(this);
 
-		for (JPanel pan : new JPanel[] {newGameMenu, mainMenu, optionsMenu}) {
+		for (JPanel pan : new JPanel[] {newGameMenu, mainMenu, optionsMenu, gameWindow}) {
 			add(pan); // add panels to frame even if they're hidden so we can control them later
 		}
 
@@ -47,14 +49,15 @@ public class MainWindow extends JFrame implements ActionListener {
 		if (e.equals(mainMenu.buttons[0])) {
 			transition(mainMenu, newGameMenu);
 		} else if (e.equals(mainMenu.buttons[1])) {
-			// load menu
+			// import board settings
+			transition(mainMenu, gameWindow);
 		} else if (e.equals(mainMenu.buttons[2])) {
 			dispose(); // exit and quit the program
 		}
 		
 		// new game menu interactions
 		else if (e.equals(newGameMenu.buttons[0])) {
-			System.out.println(0); // TODO: make them do something
+			transition(newGameMenu, gameWindow); // TODO: add checks to make sure that the gamewindow is reset properly
 		} else if (e.equals(newGameMenu.buttons[1])) {
 			optionsToNew = true;
 			transition(newGameMenu, optionsMenu); // TODO: make sure game is paused when transitioning so move timers don't run and all that
@@ -65,7 +68,7 @@ public class MainWindow extends JFrame implements ActionListener {
 		// options menu interactions
 		else if (e.equals(optionsMenu.okButton)) {
 			// TODO: apply settings
-			transition(optionsMenu, optionsToNew ? newGameMenu : mainMenu); // TODO: make a game panel because we should not be going to main
+			transition(optionsMenu, optionsToNew ? newGameMenu : gameWindow);
 		}
 	}
 
