@@ -33,7 +33,6 @@ public class AI {
     static int scoreGen(int[][] board) {
         b.board = board;
 
-        //test.printBoard(b);
         //checks all chips if there is a win
         for (int i = b.H - 1; i >= 0; i--) {
             for (int j = 0; j < b.W; j++) {
@@ -144,8 +143,6 @@ public class AI {
             int x = nextEmpty(b, i); //next empty spot in column i
             if (x == -1) continue; //if out of empty spaces continue
             b.board[x][i] = player; //try the position
-
-            test.printBoard(b);
 
             //recur until depth is 0
             if (depth != 0) {

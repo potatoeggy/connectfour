@@ -40,8 +40,6 @@ public class Board {
                 else luF = true;
             }
         }
-        /*System.out.println(cL + " " + cU + " " + cRD + " " + cRU);
-        System.out.println(x + "/" + y + " " + player);*/
         return cL >= 4 || cU >= 4 || cRD >= 4 || cRU >= 4;
     }
 
