@@ -8,13 +8,14 @@ public class test {
     public static void main(String[] args) throws IOException {
         int board[][] = new int[6][7];
         Board b = new Board();
-        board[5][0] = 2;
+        board[5][0] = board[5][2] = board[5][3] = 1;
+        /*board[5][0] = 2;
         board[5][4] = board[4][4] = 1; //4
         board[3][4] = 2;
         board[5][4 - 1] = board[4][4 - 1] = board[3][4 - 1] = 2; //3
         board[5][4 - 2] = board[4][4 - 2] = board[3][4 - 2] = 2; //2
         board[5][5] = board[5][6] = 2;
-        board[4][5] = board[4][6] = 1;
+        board[4][5] = board[4][6] = 1;*/
         b.board = board;
         System.out.println(AI.scoreGen(board));
         //System.out.println(Arrays.toString(AI.minMax(b, 3, 2)));
