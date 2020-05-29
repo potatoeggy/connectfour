@@ -162,7 +162,7 @@ public class AI {
                 }
             } else {
                 ans[i] = scoreGen(b.board);
-                System.out.println(ans[i]);
+                System.out.println(ans[i]); //debug
             } //generate score for moves
         }
         return ans;
