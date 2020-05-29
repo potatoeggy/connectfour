@@ -15,8 +15,8 @@ import javax.swing.JPanel;
 
 public class OptionsMenu extends JPanel implements ActionListener { // how do dialogs work I think I'll just use frames and timers instead
 	JButton okButton;
-	JCheckBox moveTimerEnabler; // checkbox to enable a move timer, adds a dropdown box when enabled (consider just disabling the combobox instead)
-	JComboBox<String> difficultySelect, moveTimerSelect; // select computer difficulty and timer length via dropdowns
+	private JCheckBox moveTimerEnabler; // checkbox to enable a move timer, adds a dropdown box when enabled (consider just disabling the combobox instead)
+	private JComboBox<String> difficultySelect, moveTimerSelect; // select computer difficulty and timer length via dropdowns
 	private JLabel[] labels; // label what the boxes and settings do
 	private JPanel[] fakeGrid; // gridlayout is the ugliest thing in the world so we fake it till we make it
 	private JLabel title; // header at top
@@ -81,4 +81,12 @@ public class OptionsMenu extends JPanel implements ActionListener { // how do di
 			moveTimerSelect.setEnabled(moveTimerEnabler.isSelected()); // i hope isSelected does what i think it does
 		}
 	} // end actionPerformed
+
+	public int getDifficulty() {
+		return moveTimerSelect.getSelectedIndex();
+	}
+
+	public int getTimer() {
+		return Integer.parseInt(((String) moveTimerSelect.getSelectedItem()).substring(0, 2));
+	}
 }

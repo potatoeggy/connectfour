@@ -59,4 +59,12 @@ public class NewGameMenu extends JPanel {
 		}
 		setVisible(false); // set invisible by default as visibility should be handed by main
 	}
+
+	public String[] getNames() {
+		return new String[] {nameSelect[0].getText(), nameSelect[1].getText()};
+	}
+
+	public int[] getPlayers() {
+		return new int[] {playerSelect[0].getSelectedIndex(), playerSelect[1].getSelectedIndex()};
+	}
 }
