@@ -147,7 +147,7 @@ public class AI {
             //recur until depth is 0
             if (depth != 0) {
                 if (player == 1) { //AI - find largest value
-                    value = minMax(b, depth - 1, 1, alpha, beta);
+                    value = minMax(b, depth - 1, 2, alpha, beta);
                     int max = Integer.MIN_VALUE;
                     for (int j : value) {
                         max = Math.max(max, j);
@@ -156,7 +156,7 @@ public class AI {
                     alpha = Math.max(alpha, max);
 
                 } else { //Player - find smallest value
-                    value = minMax(b, depth - 1, 2, alpha, beta);
+                    value = minMax(b, depth - 1, 1, alpha, beta);
                     int min = Integer.MAX_VALUE;
                     for (int j : value) {
                         min = Math.min(min, j);
