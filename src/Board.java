@@ -43,8 +43,10 @@ public class Board {
         return cL >= 4 || cU >= 4 || cRD >= 4 || cRU >= 4;
     }
 
-    public boolean addChip(int x, int y, int player) {
-        board[x][y] = player;
-        return checkWin(x, y, player);
+    //returns the row and updates the board
+    public int addChip(int col, int player) {
+        int row = AI.nextEmpty(this, col);
+        board[col][row] = player;
+        return row;
     }
 }
