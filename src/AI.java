@@ -131,12 +131,12 @@ public class AI {
         return rowSize * (ai - p);
     }
 
-    static int[] minMax(Board board, int depth, int player) {
-        int ans[] = new int[7]; //best answer for current player
+    static ArrayList<Integer> minMax(Board board, int depth, int player, int alpha, int beta) {
+        ArrayList<Integer> ans = new ArrayList<>(); //best answer for current player
 
         for (int i = 0; i < board.W; i++) {
             Board b = new Board(); //copy of board
-            int value[]; //value of each move
+            ArrayList<Integer> value; //value of each move
             b.board = new int[b.H][b.W];
             for (int j = 0; j < b.H; j++) b.board[j] = Arrays.copyOf(board.board[j], b.W);
 
@@ -146,23 +146,29 @@ public class AI {
 
             //recur until depth is 0
             if (depth != 0) {
-                value = minMax(b, depth - 1, ((player - 1) ^ 1) + 1);
-                if (player == 1) { //AI player - find largest value
+                if (player == 1) { //AI - find largest value
+                    value = minMax(b, depth - 1, 1, alpha, beta);
                     int max = Integer.MIN_VALUE;
                     for (int j : value) {
                         max = Math.max(max, j);
                     }
-                    ans[i] = max;
+                    ans.add(max);
+                    alpha = Math.max(alpha, max);
+
                 } else { //Player - find smallest value
+                    value = minMax(b, depth - 1, 2, alpha, beta);
                     int min = Integer.MAX_VALUE;
                     for (int j : value) {
                         min = Math.min(min, j);
                     }
-                    ans[i] = min;
+                    ans.add(min);
+                    beta = Math.min(beta, min);
                 }
+                //Alpha-Beta pruning
+                if (beta <= alpha) break;
             } else {
-                ans[i] = scoreGen(b.board);
-                System.out.println(ans[i]); //debug
+                ans.add(scoreGen(b.board));
+                System.out.println(ans.get(i)); //debug
             } //generate score for moves
         }
         return ans;
