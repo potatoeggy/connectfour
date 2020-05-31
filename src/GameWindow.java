@@ -5,7 +5,7 @@
 import java.awt.event.*;
 import java.awt.*;
 import javax.swing.*;
-import java.io.File;
+import javax.imageio.ImageIO;
 
 public class GameWindow extends JPanel implements ActionListener {
 	private final JPanel header;
@@ -32,23 +32,14 @@ public class GameWindow extends JPanel implements ActionListener {
 		moveTimer = new JLabel("move timer");
 		legacyGraphics = false;
 
-		File tester;
-
-		for (String s : new String[] {"resources/arrow.png", "resources/red.png", "resources/yellow.png"}) {
-			tester = new File(s);
-			if (! tester.exists() || tester.isDirectory()) {
-				System.err.println("One or more necessary resources were not found. Falling back to legacy graphics.");
-				legacyGraphics = true;
-				break;
-			}
-		}
 		try {
-			arrow = new ImageIcon("resources/arrow.png");
-			redPiece = new ImageIcon("resources/red.png");
-			yellowPiece = new ImageIcon("resources/yellow.png");
+			arrow = new ImageIcon(ImageIO.read(getClass().getResource("resources/arrow.png")));
+			redPiece = new ImageIcon(ImageIO.read(getClass().getResource("resources/red.png")));
+			yellowPiece = new ImageIcon(ImageIO.read(getClass().getResource("resources/yellow.png")));
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.err.println("Something broke really badly when reading files");
+			System.err.println("One or more necessary resources were not found. Falling back to legacy graphics.");
+			legacyGraphics = true;
 		}
 
 		for (JButton butt : headerButtons) {
