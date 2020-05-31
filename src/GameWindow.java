@@ -16,30 +16,30 @@ public class GameWindow extends JPanel implements ActionListener {
 	private final JLabel gameStatus;
 	private final JLabel moveTimer; // status and timer, if enabled
 	private final JButton[][] buttonGrid; // connect 4 grid
-	private final ImageIcon arrow, redPiece, yellowPiece; // graphics
+	private ImageIcon arrow, redPiece, yellowPiece; // graphics
 	private boolean legacyGraphics;
 
 	// internal game variables copied from MainWindow
 	private Board board;
-	private int currentPlayer, moveTimerRemaining, moveTimerFull, cpuDifficulty;
+	private int currentPlayer, cpuDifficulty;
 	private int[] players;
 	private String[] names;
 
 	public GameWindow(ActionListener eventHandler) {
+		legacyGraphics = false;
+		board = new Board();
+		currentPlayer = 1;
+		cpuDifficulty = 0;
+		players = new int[2];
+		names = new String[] {"Player 1", "Player 2"};
 		header = new JPanel();
 		headerJustification = new JPanel[]{new JPanel(), new JPanel(), new JPanel()};
 		body = new JPanel();
 		headerButtons = new JButton[]{new JButton("Save & quit"), new JButton("New game")};
 		optionsButton = new JButton("Options");
 		buttonGrid = new JButton[7][7];
-		gameStatus = new JLabel("temporary header");
-		moveTimer = new JLabel("move timer");
-		legacyGraphics = false;
-		board = new Board();
-		currentPlayer = cpuDifficulty = 0;
-		moveTimerRemaining = moveTimerFull = -1;
-		players = new int[2];
-		names = new String[2];
+		gameStatus = new JLabel(names[0] + "'s turn");
+		moveTimer = new JLabel();
 
 		try {
 			arrow = new ImageIcon(ImageIO.read(getClass().getResource("resources/arrow.png")));
@@ -96,6 +96,7 @@ public class GameWindow extends JPanel implements ActionListener {
 
 		for (int i = 0; i < buttonGrid[0].length; i++) {
 			buttonGrid[0][i].setBorder(BorderFactory.createMatteBorder(0, 0, 0, 0, Color.WHITE)); // make top open-ended
+			buttonGrid[0][i].setText(null);
 		}
 
 		add(header);
@@ -108,7 +109,6 @@ public class GameWindow extends JPanel implements ActionListener {
 	}
 
 	public void actionPerformed(ActionEvent event) { // this is going to contain a lot of stuff too
-		// TODO: reinitialise all buttons (probably init function) after leaving 
 		int column = (Integer) (((JButton) event.getSource()).getClientProperty("y"));
 		int row = board.addChip(column, currentPlayer);
 		if (row != -1) {
@@ -121,18 +121,33 @@ public class GameWindow extends JPanel implements ActionListener {
 
 			if (board.checkWin(row, column, currentPlayer)) { // check if a player wins
 				System.out.println("win");
+			} else {
+				currentPlayer *= -1;
+				gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + "'s turn");
 			}
-			// TODO: switch players here
 		}
 	}
 
-	public void setSettings(int currentPlayer, int cpuDifficulty, int moveTimerRemaining, int moveTimerFull, int[] players, String[] names) {
+	public void setSettings(int currentPlayer, int cpuDifficulty, int[] players, String[] names) {
 		this.currentPlayer = currentPlayer;
 		this.cpuDifficulty = cpuDifficulty;
-		this.moveTimerRemaining = moveTimerRemaining;
-		this.moveTimerFull = moveTimerFull;
 		this.players = players;
 		this.names = names;
+	}
+
+	public void setTimer(int moveTimerRemaining) {
+		if (moveTimerRemaining > 0) {
+			this.moveTimer.setText("" + moveTimerRemaining);
+		}
+	}
+
+	public void setNames(String[] names) {
+		this.names = names;
+		if (currentPlayer == 1) this.gameStatus.setText(names[0] + "'s turn");
+	}
+
+	public void setPlayers(int[] players) {
+		this.players = players;
 	}
 
 	public void setBoard(Board board) {
@@ -149,21 +164,5 @@ public class GameWindow extends JPanel implements ActionListener {
 
 	public int getDifficulty() {
 		return this.cpuDifficulty;
-	}
-
-	public int getTimerRemaining() {
-		return this.moveTimerRemaining;
-	}
-
-	public int getTimerFull() {
-		return this.moveTimerFull;
-	}
-
-	public String[] getNames() {
-		return this.names;
-	}
-
-	public int[] getPlayers() {
-		return this.players;
 	}
 }

@@ -33,19 +33,19 @@ public class MainWindow extends JFrame implements ActionListener {
 
 
 	public MainWindow() {
-		newGameMenu = new NewGameMenu(this);
-		mainMenu = new MainMenu(this);
-		optionsMenu = new OptionsMenu(this);
-		board = new Board();
-		gameWindow = new GameWindow(this);
-
 		// initialising internal variables
 		currentPlayer = 1;
 		cpuDifficulty = 1;
 		moveTimerInternal = -1;
 		moveTimerFull = -1;
 		players = new int[2];
-		names = new String[2];
+		names = new String[] {"Player 1", "Player 2"};
+		
+		newGameMenu = new NewGameMenu(this);
+		mainMenu = new MainMenu(this);
+		optionsMenu = new OptionsMenu(this);
+		board = new Board();
+		gameWindow = new GameWindow(this);
 
 		for (JPanel pan : new JPanel[] {newGameMenu, mainMenu, optionsMenu, gameWindow}) {
 			add(pan); // add panels to frame even if they're hidden so we can control them later
@@ -88,7 +88,9 @@ public class MainWindow extends JFrame implements ActionListener {
 		else if (e.equals(newGameMenu.buttons[0])) {
 			names = newGameMenu.getNames();
 			players = newGameMenu.getPlayers();
-			transition(newGameMenu, gameWindow); // TODO: add checks to make sure that the gamewindow is reset properly
+			gameWindow = new GameWindow(this);
+			add(gameWindow);
+			transition(newGameMenu, gameWindow);
 		} else if (e.equals(newGameMenu.buttons[1])) {
 			optionsToNew = true;
 			transition(newGameMenu, optionsMenu); // TODO: make sure game is paused when transitioning so move timers don't run and all that
@@ -105,19 +107,18 @@ public class MainWindow extends JFrame implements ActionListener {
 
 		// game window interactions
 		else if (e.equals(gameWindow.optionsButton)) {
-			// TODO: pause the game
+			// TODO: pause the timer
 			optionsToNew = false;
 			transition(gameWindow, optionsMenu);
 		} else if (e.equals(gameWindow.headerButtons[0])) {
 			// TODO: save
 			transition(gameWindow, mainMenu);
 		} else if (e.equals(gameWindow.headerButtons[1])) {
-			// TODO: issue 11: maybe add confirmation dialog
 			transition(gameWindow, newGameMenu);
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		for (String s : new String[] {
 			"Label",
 			"Button",
@@ -128,6 +129,16 @@ public class MainWindow extends JFrame implements ActionListener {
 		}
 		MainWindow win = new MainWindow();
 		win.setVisible(true);
-		// TODO: prettify the UI because Swing is the ugliest thing ever, maybe use a different LAF
+
+		while (true) {
+			while (win.gameWindow.isVisible()) {
+				if (win.moveTimerInternal == 0) { // lose or play random piece
+					win.moveTimerInternal = win.moveTimerFull;
+				}
+				win.gameWindow.setTimer(win.moveTimerInternal);
+				// wait a minute what happens when they click a button since the move timer needs to be reset (probably use two action listeners)
+				Thread.sleep(1000);
+			}
+		}
 	}
 }
