@@ -2,12 +2,10 @@
 // 28 May 2020
 // The bulk of the annoying stuff to do
 
-import javax.swing.*;
+import java.awt.event.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import javax.swing.*;
+import java.io.File;
 
 public class GameWindow extends JPanel implements ActionListener {
 	private final JPanel header;
@@ -20,6 +18,7 @@ public class GameWindow extends JPanel implements ActionListener {
 	private final JButton[][] buttonGrid = new JButton[7][7]; // connect 4 grid
 	private ImageIcon arrow, redPiece, yellowPiece; // graphics
 	private final MainWindow eventHandler; // global event handler and settings manager
+	private boolean legacyGraphics;
 
 	public GameWindow(MainWindow eventHandler, Board board) {
 		this.eventHandler = eventHandler;
@@ -28,14 +27,27 @@ public class GameWindow extends JPanel implements ActionListener {
 		body = new JPanel();
 		headerButtons = new JButton[]{new JButton("Save & quit"), new JButton("New game")};
 		optionsButton = new JButton("Options");
+		buttonGrid = new JButton[7][7];
 		gameStatus = new JLabel("temporary header");
 		moveTimer = new JLabel("move timer");
+		legacyGraphics = false;
+
+		File tester;
+
+		for (String s : new String[] {"resources/arrow.png", "resources/red.png", "resources/yellow.png"}) {
+			tester = new File(s);
+			if (! tester.exists() || tester.isDirectory()) {
+				System.err.println("One or more necessary resources were not found. Falling back to legacy graphics.");
+				legacyGraphics = true;
+			}
+		}
 		try {
 			arrow = new ImageIcon("resources/arrow.png");
 			redPiece = new ImageIcon("resources/red.png");
 			yellowPiece = new ImageIcon("resources/yellow.png");
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.err.println("Something broke really badly when reading files")
 		}
 
 		for (JButton butt : headerButtons) {
@@ -103,8 +115,9 @@ public class GameWindow extends JPanel implements ActionListener {
 			buttonGrid[row+1][column].setText(null); // centre icon
 			buttonGrid[row+1][column].setIcon(eventHandler.getCurrentPlayer() == 1 ? redPiece : yellowPiece); // make it known to user (no idea how to force square gridlayouts)
 			buttonGrid[row+1][column].setRolloverEnabled(false);
-			buttonGrid[row+1][column].setContentAreaFilled(false); // "disable" button because setEnabled is garbage and makes everything gray
+			if (!legacyGraphics) buttonGrid[row+1][column].setContentAreaFilled(false); // "disable" button because setEnabled is garbage and makes everything gray
 			buttonGrid[row+1][column].removeActionListener(this);
+			
 			if (eventHandler.getBoard().checkWin(row, column, eventHandler.getCurrentPlayer())) { // check if a player wins
 				System.out.println("win");
 			}
