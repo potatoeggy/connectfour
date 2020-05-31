@@ -15,7 +15,7 @@ public class GameWindow extends JPanel implements ActionListener {
 	JButton optionsButton; // options
 	private final JLabel gameStatus;
 	private final JLabel moveTimer; // status and timer, if enabled
-	private final JButton[][] buttonGrid = new JButton[7][7]; // connect 4 grid
+	private final JButton[][] buttonGrid; // connect 4 grid
 	private ImageIcon arrow, redPiece, yellowPiece; // graphics
 	private final MainWindow eventHandler; // global event handler and settings manager
 	private boolean legacyGraphics;
@@ -39,6 +39,7 @@ public class GameWindow extends JPanel implements ActionListener {
 			if (! tester.exists() || tester.isDirectory()) {
 				System.err.println("One or more necessary resources were not found. Falling back to legacy graphics.");
 				legacyGraphics = true;
+				break;
 			}
 		}
 		try {
@@ -47,7 +48,7 @@ public class GameWindow extends JPanel implements ActionListener {
 			yellowPiece = new ImageIcon("resources/yellow.png");
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.err.println("Something broke really badly when reading files")
+			System.err.println("Something broke really badly when reading files");
 		}
 
 		for (JButton butt : headerButtons) {
@@ -117,7 +118,7 @@ public class GameWindow extends JPanel implements ActionListener {
 			buttonGrid[row+1][column].setRolloverEnabled(false);
 			if (!legacyGraphics) buttonGrid[row+1][column].setContentAreaFilled(false); // "disable" button because setEnabled is garbage and makes everything gray
 			buttonGrid[row+1][column].removeActionListener(this);
-			
+
 			if (eventHandler.getBoard().checkWin(row, column, eventHandler.getCurrentPlayer())) { // check if a player wins
 				System.out.println("win");
 			}
