@@ -37,7 +37,7 @@ public class MainWindow extends JFrame implements ActionListener {
 		mainMenu = new MainMenu(this);
 		optionsMenu = new OptionsMenu(this);
 		board = new Board();
-		gameWindow = new GameWindow(this, board);
+		gameWindow = new GameWindow(this);
 
 		// initialising internal variables
 		currentPlayer = 1;
@@ -129,33 +129,5 @@ public class MainWindow extends JFrame implements ActionListener {
 		MainWindow win = new MainWindow();
 		win.setVisible(true);
 		// TODO: prettify the UI because Swing is the ugliest thing ever, maybe use a different LAF
-	}
-
-	public int[] getPlayers() {
-		return this.players;
-	}
-
-	public String[] getNames() {
-		return this.names;
-	}
-
-	public Board getBoard() {
-		return this.board;
-	}
-
-	public int getCurrentPlayer() {
-		return this.currentPlayer;
-	}
-
-	public int getDifficulty() {
-		return this.cpuDifficulty;
-	}
-
-	public int getMaxTimer() {
-		return this.moveTimerFull;
-	}
-
-	public int getTimer() {
-		return this.moveTimerInternal;
 	}
 }

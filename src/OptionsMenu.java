@@ -83,10 +83,18 @@ public class OptionsMenu extends JPanel implements ActionListener { // how do di
 	} // end actionPerformed
 
 	public int getDifficulty() {
-		return moveTimerSelect.getSelectedIndex();
+		return difficultySelect.getSelectedIndex();
+	}
+
+	public void setDifficulty(int difficultyIndex) {
+		this.difficultySelect.setSelectedIndex(difficultyIndex);
 	}
 
 	public int getTimer() {
 		return Integer.parseInt(((String) moveTimerSelect.getSelectedItem()).substring(0, 2));
+	}
+
+	public void setTimer(int timerIndex) {
+		this.moveTimerSelect.setSelectedItem(timerIndex);
 	}
 }

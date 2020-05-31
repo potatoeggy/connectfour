@@ -16,12 +16,16 @@ public class GameWindow extends JPanel implements ActionListener {
 	private final JLabel gameStatus;
 	private final JLabel moveTimer; // status and timer, if enabled
 	private final JButton[][] buttonGrid; // connect 4 grid
-	private ImageIcon arrow, redPiece, yellowPiece; // graphics
-	private final MainWindow eventHandler; // global event handler and settings manager
+	private final ImageIcon arrow, redPiece, yellowPiece; // graphics
 	private boolean legacyGraphics;
 
-	public GameWindow(MainWindow eventHandler, Board board) {
-		this.eventHandler = eventHandler;
+	// internal game variables copied from MainWindow
+	private Board board;
+	private int currentPlayer, moveTimerRemaining, moveTimerFull, cpuDifficulty;
+	private int[] players;
+	private String[] names;
+
+	public GameWindow(ActionListener eventHandler) {
 		header = new JPanel();
 		headerJustification = new JPanel[]{new JPanel(), new JPanel(), new JPanel()};
 		body = new JPanel();
@@ -31,6 +35,11 @@ public class GameWindow extends JPanel implements ActionListener {
 		gameStatus = new JLabel("temporary header");
 		moveTimer = new JLabel("move timer");
 		legacyGraphics = false;
+		board = new Board();
+		currentPlayer = cpuDifficulty = 0;
+		moveTimerRemaining = moveTimerFull = -1;
+		players = new int[2];
+		names = new String[2];
 
 		try {
 			arrow = new ImageIcon(ImageIO.read(getClass().getResource("resources/arrow.png")));
@@ -101,19 +110,60 @@ public class GameWindow extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent event) { // this is going to contain a lot of stuff too
 		// TODO: reinitialise all buttons (probably init function) after leaving 
 		int column = (Integer) (((JButton) event.getSource()).getClientProperty("y"));
-		int row = eventHandler.getBoard().addChip(column, eventHandler.getCurrentPlayer());
+		int row = board.addChip(column, currentPlayer);
 		if (row != -1) {
-			buttonGrid[row+1][column].setBackground(eventHandler.getCurrentPlayer() == 1 ? Color.RED : Color.YELLOW); // unfortunately used to determine if something is occupying the square
+			buttonGrid[row+1][column].setBackground(currentPlayer == 1 ? Color.RED : Color.YELLOW); // unfortunately used to determine if something is occupying the square
 			buttonGrid[row+1][column].setText(null); // centre icon
-			buttonGrid[row+1][column].setIcon(eventHandler.getCurrentPlayer() == 1 ? redPiece : yellowPiece); // make it known to user (no idea how to force square gridlayouts)
+			buttonGrid[row+1][column].setIcon(currentPlayer == 1 ? redPiece : yellowPiece); // make it known to user (no idea how to force square gridlayouts)
 			buttonGrid[row+1][column].setRolloverEnabled(false);
 			if (!legacyGraphics) buttonGrid[row+1][column].setContentAreaFilled(false); // "disable" button because setEnabled is garbage and makes everything gray
 			buttonGrid[row+1][column].removeActionListener(this);
 
-			if (eventHandler.getBoard().checkWin(row, column, eventHandler.getCurrentPlayer())) { // check if a player wins
+			if (board.checkWin(row, column, currentPlayer)) { // check if a player wins
 				System.out.println("win");
 			}
 			// TODO: switch players here
 		}
+	}
+
+	public void setSettings(int currentPlayer, int cpuDifficulty, int moveTimerRemaining, int moveTimerFull, int[] players, String[] names) {
+		this.currentPlayer = currentPlayer;
+		this.cpuDifficulty = cpuDifficulty;
+		this.moveTimerRemaining = moveTimerRemaining;
+		this.moveTimerFull = moveTimerFull;
+		this.players = players;
+		this.names = names;
+	}
+
+	public void setBoard(Board board) {
+		this.board = board;
+	}
+
+	public Board getBoard() {
+		return this.board;
+	}
+
+	public int getCurrentPlayer() {
+		return this.currentPlayer;
+	}
+
+	public int getDifficulty() {
+		return this.cpuDifficulty;
+	}
+
+	public int getTimerRemaining() {
+		return this.moveTimerRemaining;
+	}
+
+	public int getTimerFull() {
+		return this.moveTimerFull;
+	}
+
+	public String[] getNames() {
+		return this.names;
+	}
+
+	public int[] getPlayers() {
+		return this.players;
 	}
 }
