@@ -46,6 +46,7 @@ public class Board {
     //returns the row and updates the board
     public int addChip(int col, int player) {
         int row = AI.nextEmpty(this, col);
+        //System.out.println(row + " " + col);
         board[row][col] = player;
         return row;
     }

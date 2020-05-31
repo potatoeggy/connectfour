@@ -46,7 +46,7 @@ public class GameWindow extends JPanel implements ActionListener {
 
 		for (int i = 0; i < buttonGrid.length; i++) { // fill in the button arrays
 			for (int j = 0; j < buttonGrid[i].length; j++) {
-				buttonGrid[i][j] = new JButton("<html><br><br><br><br><br><br></html>"); // make multi-line buttons
+				buttonGrid[i][j] = new JButton("<html><br><br><br><br><br><p>" + i + " " + j + "</p></html>"); // make multi-line buttons
 				buttonGrid[i][j].addActionListener(this);
 				buttonGrid[i][j].setBorder(BorderFactory.createLineBorder(Color.BLACK)); // create a grid
 				buttonGrid[i][j].putClientProperty("x", new Integer(i)); // store coordinates
@@ -84,11 +84,11 @@ public class GameWindow extends JPanel implements ActionListener {
 	}
 
 	public void actionPerformed(ActionEvent event) { // this is going to contain a lot of stuff too
-		int x = (Integer) (((JButton) event.getSource()).getClientProperty("x"));
+		int column = (Integer) (((JButton) event.getSource()).getClientProperty("y"));
 		// TODO: perform sanity checking
-		int row = eventHandler.getBoard().addChip(x, eventHandler.getCurrentPlayer());
-		if (row == -1) {
-			
+		int row = eventHandler.getBoard().addChip(column, eventHandler.getCurrentPlayer());
+		if (row != -1) {
+			buttonGrid[row][column].setBackground(eventHandler.getCurrentPlayer() == 1 ? Color.RED : Color.YELLOW); // reminder: work around board zero limitations by using playerIndex - 1 when getting names
 		}
 	}
 }

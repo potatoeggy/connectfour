@@ -40,7 +40,7 @@ public class MainWindow extends JFrame implements ActionListener {
 		gameWindow = new GameWindow(this, board);
 
 		// initialising internal variables
-		currentPlayer = 0;
+		currentPlayer = 1;
 		cpuDifficulty = 1;
 		moveTimerInternal = -1;
 		moveTimerFull = -1;
