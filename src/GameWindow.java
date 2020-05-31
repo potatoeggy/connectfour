@@ -2,30 +2,45 @@
 // 28 May 2020
 // The bulk of the annoying stuff to do
 
-import java.awt.*;
 import java.awt.event.*;
+import java.awt.*;
 import javax.swing.*;
+import javax.imageio.ImageIO;
 
 public class GameWindow extends JPanel implements ActionListener {
-	private JPanel header, body; // two panels for main game and status
-	private JPanel[] headerJustification; // align things left, centre, and right
+	private final JPanel header;
+	private final JPanel body; // two panels for main game and status
+	private final JPanel[] headerJustification; // align things left, centre, and right
 	JButton[] headerButtons; // new game, save and quit
 	JButton optionsButton; // options
-	private JLabel gameStatus, moveTimer; // status and timer, if enabled
-	private JButton[][] buttonGrid = new JButton[7][7]; // connect 4 grid
-	private ImageIcon arrow; // shows where the square is going to fall
-	private MainWindow eventHandler; // global event handler and settings manager
+	private final JLabel gameStatus;
+	private final JLabel moveTimer; // status and timer, if enabled
+	private final JButton[][] buttonGrid; // connect 4 grid
+	private ImageIcon arrow, redPiece, yellowPiece; // graphics
+	private final MainWindow eventHandler; // global event handler and settings manager
+	private boolean legacyGraphics;
 
 	public GameWindow(MainWindow eventHandler, Board board) {
 		this.eventHandler = eventHandler;
 		header = new JPanel();
-		headerJustification = new JPanel[] {new JPanel(), new JPanel(), new JPanel()};
+		headerJustification = new JPanel[]{new JPanel(), new JPanel(), new JPanel()};
 		body = new JPanel();
-		headerButtons = new JButton[] {new JButton("Save and quit"), new JButton("New game")};
+		headerButtons = new JButton[]{new JButton("Save & quit"), new JButton("New game")};
 		optionsButton = new JButton("Options");
+		buttonGrid = new JButton[7][7];
 		gameStatus = new JLabel("temporary header");
-		moveTimer = new JLabel("temporary move timer");
-		arrow = new ImageIcon("resources/arrow.png");
+		moveTimer = new JLabel("move timer");
+		legacyGraphics = false;
+
+		try {
+			arrow = new ImageIcon(ImageIO.read(getClass().getResource("resources/arrow.png")));
+			redPiece = new ImageIcon(ImageIO.read(getClass().getResource("resources/red.png")));
+			yellowPiece = new ImageIcon(ImageIO.read(getClass().getResource("resources/yellow.png")));
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println("One or more necessary resources were not found. Falling back to legacy graphics.");
+			legacyGraphics = true;
+		}
 
 		for (JButton butt : headerButtons) {
 			headerJustification[0].add(butt); // justify left
@@ -49,8 +64,8 @@ public class GameWindow extends JPanel implements ActionListener {
 				buttonGrid[i][j] = new JButton("<html><br><br><br><br><br><br></html>"); // make multi-line buttons
 				buttonGrid[i][j].addActionListener(this);
 				buttonGrid[i][j].setBorder(BorderFactory.createLineBorder(Color.BLACK)); // create a grid
-				buttonGrid[i][j].putClientProperty("x", new Integer(i)); // store coordinates
-				buttonGrid[i][j].putClientProperty("y", new Integer(j));
+				buttonGrid[i][j].putClientProperty("x", i); // store coordinates
+				buttonGrid[i][j].putClientProperty("y", j);
 				buttonGrid[i][j].setBackground(Color.WHITE); // make pretty
 				buttonGrid[i][j].setFocusPainted(false); // do not have ugly lines
 				buttonGrid[i][j].addMouseListener(new MouseAdapter() {
@@ -84,9 +99,21 @@ public class GameWindow extends JPanel implements ActionListener {
 	}
 
 	public void actionPerformed(ActionEvent event) { // this is going to contain a lot of stuff too
-		// this is temporary since the board class should be updated to handle column only things
-		int x = (Integer) (((JButton) event.getSource()).getClientProperty("x"));
-		int y = (Integer) (((JButton) event.getSource()).getClientProperty("y"));
-		eventHandler.getBoard().addChip(x, y, eventHandler.getCurrentPlayer());
+		// TODO: reinitialise all buttons (probably init function) after leaving 
+		int column = (Integer) (((JButton) event.getSource()).getClientProperty("y"));
+		int row = eventHandler.getBoard().addChip(column, eventHandler.getCurrentPlayer());
+		if (row != -1) {
+			buttonGrid[row+1][column].setBackground(eventHandler.getCurrentPlayer() == 1 ? Color.RED : Color.YELLOW); // unfortunately used to determine if something is occupying the square
+			buttonGrid[row+1][column].setText(null); // centre icon
+			buttonGrid[row+1][column].setIcon(eventHandler.getCurrentPlayer() == 1 ? redPiece : yellowPiece); // make it known to user (no idea how to force square gridlayouts)
+			buttonGrid[row+1][column].setRolloverEnabled(false);
+			if (!legacyGraphics) buttonGrid[row+1][column].setContentAreaFilled(false); // "disable" button because setEnabled is garbage and makes everything gray
+			buttonGrid[row+1][column].removeActionListener(this);
+
+			if (eventHandler.getBoard().checkWin(row, column, eventHandler.getCurrentPlayer())) { // check if a player wins
+				System.out.println("win");
+			}
+			// TODO: switch players here
+		}
 	}
 }

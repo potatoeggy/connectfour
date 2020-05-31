@@ -40,7 +40,7 @@ public class MainWindow extends JFrame implements ActionListener {
 		gameWindow = new GameWindow(this, board);
 
 		// initialising internal variables
-		currentPlayer = 0;
+		currentPlayer = 1;
 		cpuDifficulty = 1;
 		moveTimerInternal = -1;
 		moveTimerFull = -1;
@@ -55,6 +55,7 @@ public class MainWindow extends JFrame implements ActionListener {
 		getRootPane().setBorder(BorderFactory.createLineBorder(Color.WHITE, 10)); // make margins so it's nicer to use
 		getContentPane().setBackground(Color.WHITE);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setLocationByPlatform(true);
 		setTitle("Connect 4");
 		transition(mainMenu);
 	} // end constructor
