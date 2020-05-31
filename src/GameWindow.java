@@ -84,9 +84,11 @@ public class GameWindow extends JPanel implements ActionListener {
 	}
 
 	public void actionPerformed(ActionEvent event) { // this is going to contain a lot of stuff too
-		// this is temporary since the board class should be updated to handle column only things
 		int x = (Integer) (((JButton) event.getSource()).getClientProperty("x"));
-		int y = (Integer) (((JButton) event.getSource()).getClientProperty("y"));
-		eventHandler.getBoard().addChip(x, y, eventHandler.getCurrentPlayer());
+		// TODO: perform sanity checking
+		int row = eventHandler.getBoard().addChip(x, eventHandler.getCurrentPlayer());
+		if (row == -1) {
+			
+		}
 	}
 }
