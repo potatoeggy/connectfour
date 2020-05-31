@@ -55,6 +55,7 @@ public class MainWindow extends JFrame implements ActionListener {
 		getRootPane().setBorder(BorderFactory.createLineBorder(Color.WHITE, 10)); // make margins so it's nicer to use
 		getContentPane().setBackground(Color.WHITE);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setLocationByPlatform(true);
 		setTitle("Connect 4");
 		transition(mainMenu);
 	} // end constructor
