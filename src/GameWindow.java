@@ -13,7 +13,7 @@ public class GameWindow extends JPanel implements ActionListener {
 	JButton optionsButton; // options
 	private JLabel gameStatus, moveTimer; // status and timer, if enabled
 	private JButton[][] buttonGrid = new JButton[7][7]; // connect 4 grid
-	private ImageIcon arrow; // shows where the square is going to fall
+	private ImageIcon arrow, redPiece, yellowPiece; // graphics
 	private MainWindow eventHandler; // global event handler and settings manager
 
 	public GameWindow(MainWindow eventHandler, Board board) {
@@ -21,11 +21,17 @@ public class GameWindow extends JPanel implements ActionListener {
 		header = new JPanel();
 		headerJustification = new JPanel[] {new JPanel(), new JPanel(), new JPanel()};
 		body = new JPanel();
-		headerButtons = new JButton[] {new JButton("Save and quit"), new JButton("New game")};
+		headerButtons = new JButton[] {new JButton("Save & quit"), new JButton("New game")};
 		optionsButton = new JButton("Options");
 		gameStatus = new JLabel("temporary header");
-		moveTimer = new JLabel("temporary move timer");
-		arrow = new ImageIcon("resources/arrow.png");
+		moveTimer = new JLabel("move timer");
+		try {
+			arrow = new ImageIcon("resources/arrow.png");
+			redPiece = new ImageIcon("resources/red.png");
+			yellowPiece = new ImageIcon("resources/yellow.png");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		for (JButton butt : headerButtons) {
 			headerJustification[0].add(butt); // justify left
@@ -46,7 +52,7 @@ public class GameWindow extends JPanel implements ActionListener {
 
 		for (int i = 0; i < buttonGrid.length; i++) { // fill in the button arrays
 			for (int j = 0; j < buttonGrid[i].length; j++) {
-				buttonGrid[i][j] = new JButton("<html><br><br><br><br><br></html>"); // make multi-line buttons
+				buttonGrid[i][j] = new JButton("<html><br><br><br><br><br><br></html>"); // make multi-line buttons
 				buttonGrid[i][j].addActionListener(this);
 				buttonGrid[i][j].setBorder(BorderFactory.createLineBorder(Color.BLACK)); // create a grid
 				buttonGrid[i][j].putClientProperty("x", new Integer(i)); // store coordinates
@@ -84,14 +90,20 @@ public class GameWindow extends JPanel implements ActionListener {
 	}
 
 	public void actionPerformed(ActionEvent event) { // this is going to contain a lot of stuff too
+		// TODO: reinitialise all buttons (probably init function) after leaving 
 		int column = (Integer) (((JButton) event.getSource()).getClientProperty("y"));
 		int row = eventHandler.getBoard().addChip(column, eventHandler.getCurrentPlayer());
 		if (row != -1) {
-			buttonGrid[row+1][column].setBackground(eventHandler.getCurrentPlayer() == 1 ? Color.RED : Color.YELLOW); // reminder: work around board zero limitations by using playerIndex - 1 when getting names
+			buttonGrid[row+1][column].setBackground(eventHandler.getCurrentPlayer() == 1 ? Color.RED : Color.YELLOW); // unfortunately used to determine if something is occupying the square
+			buttonGrid[row+1][column].setText(null); // centre icon
+			buttonGrid[row+1][column].setIcon(eventHandler.getCurrentPlayer() == 1 ? redPiece : yellowPiece); // make it known to user (no idea how to force square gridlayouts)
+			buttonGrid[row+1][column].setRolloverEnabled(false);
+			buttonGrid[row+1][column].setContentAreaFilled(false); // "disable" button because setEnabled is garbage and makes everything gray
+			buttonGrid[row+1][column].removeActionListener(this);
+			if (eventHandler.getBoard().checkWin(row, column, eventHandler.getCurrentPlayer())) { // check if a player wins
+				System.out.println("win");
+			}
 			// TODO: switch players here
-		}
-		if (eventHandler.getBoard().checkWin(row, column, eventHandler.getCurrentPlayer())) { // check if a player wins
-			System.out.println("win");
 		}
 	}
 }
