@@ -4,6 +4,7 @@
 
 // TODO: consider javadoc since maybe that'll give more marks
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -12,7 +13,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
-import java.awt.*;
 
 public class MainWindow extends JFrame implements ActionListener {
 	// grab all the panels
