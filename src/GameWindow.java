@@ -18,6 +18,7 @@ public class GameWindow extends JPanel implements ActionListener {
 	private final JButton[][] buttonGrid; // connect 4 grid
 	private ImageIcon arrow, redPiece, yellowPiece; // graphics
 	private boolean legacyGraphics;
+	private boolean gameOver;
 
 	// internal game variables copied from MainWindow
 	private Board board;
@@ -27,6 +28,7 @@ public class GameWindow extends JPanel implements ActionListener {
 
 	public GameWindow(ActionListener eventHandler) {
 		legacyGraphics = false;
+		gameOver = false;
 		board = new Board();
 		currentPlayer = 1;
 		cpuDifficulty = 0;
@@ -40,6 +42,8 @@ public class GameWindow extends JPanel implements ActionListener {
 		buttonGrid = new JButton[7][7];
 		gameStatus = new JLabel(names[0] + "'s turn");
 		moveTimer = new JLabel();
+
+		gameStatus.setFont(new Font("sans-serif", Font.BOLD, 18));
 
 		try {
 			arrow = new ImageIcon(ImageIO.read(getClass().getResource("resources/arrow.png")));
@@ -108,7 +112,8 @@ public class GameWindow extends JPanel implements ActionListener {
 		setVisible(false);
 	}
 
-	public void actionPerformed(ActionEvent event) { // this is going to contain a lot of stuff too
+	public void actionPerformed(ActionEvent event) {
+		if (gameOver) return;
 		int column = (Integer) (((JButton) event.getSource()).getClientProperty("y"));
 		int row = board.addChip(column, currentPlayer);
 		if (row != -1) {
@@ -120,7 +125,11 @@ public class GameWindow extends JPanel implements ActionListener {
 			buttonGrid[row+1][column].removeActionListener(this);
 
 			if (board.checkWin(row, column, currentPlayer)) { // check if a player wins
-				System.out.println("win");
+				gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + " wins!");
+				headerButtons[0].setText("Quit");
+				gameOver = true;
+				// TODO: if implementing move timer pause it
+				// TODO: highlight or make buttons flash?
 			} else {
 				currentPlayer *= -1;
 				gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + "'s turn");
@@ -128,11 +137,12 @@ public class GameWindow extends JPanel implements ActionListener {
 		}
 	}
 
-	public void setSettings(int currentPlayer, int cpuDifficulty, int[] players, String[] names) {
-		this.currentPlayer = currentPlayer;
+	public boolean isGameOver() {
+		return this.gameOver;
+	}
+
+	public void setDifficulty(int cpuDifficulty) {
 		this.cpuDifficulty = cpuDifficulty;
-		this.players = players;
-		this.names = names;
 	}
 
 	public void setTimer(int moveTimerRemaining) {
@@ -160,9 +170,5 @@ public class GameWindow extends JPanel implements ActionListener {
 
 	public int getCurrentPlayer() {
 		return this.currentPlayer;
-	}
-
-	public int getDifficulty() {
-		return this.cpuDifficulty;
 	}
 }

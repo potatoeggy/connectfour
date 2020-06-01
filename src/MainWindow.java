@@ -89,6 +89,10 @@ public class MainWindow extends JFrame implements ActionListener {
 			names = newGameMenu.getNames();
 			players = newGameMenu.getPlayers();
 			gameWindow = new GameWindow(this);
+			gameWindow.setNames(names);
+			gameWindow.setPlayers(players);
+			gameWindow.setTimer(moveTimerInternal);
+			gameWindow.setDifficulty(cpuDifficulty);
 			add(gameWindow);
 			transition(newGameMenu, gameWindow);
 		} else if (e.equals(newGameMenu.buttons[1])) {
@@ -107,16 +111,19 @@ public class MainWindow extends JFrame implements ActionListener {
 
 		// game window interactions
 		else if (e.equals(gameWindow.optionsButton)) {
-			// TODO: pause the timer
+			gameWindow.setDifficulty(cpuDifficulty);
 			optionsToNew = false;
 			transition(gameWindow, optionsMenu);
 		} else if (e.equals(gameWindow.headerButtons[0])) {
-			// TODO: save
+			if (!gameWindow.isGameOver()) {
+				// TODO: save
+			}
 			transition(gameWindow, mainMenu);
 		} else if (e.equals(gameWindow.headerButtons[1])) {
 			transition(gameWindow, newGameMenu);
 		}
 	}
+	// TODO: implement dark mode
 
 	public static void main(String[] args) throws InterruptedException {
 		for (String s : new String[] {
@@ -136,7 +143,7 @@ public class MainWindow extends JFrame implements ActionListener {
 					win.moveTimerInternal = win.moveTimerFull;
 				}
 				win.gameWindow.setTimer(win.moveTimerInternal);
-				// wait a minute what happens when they click a button since the move timer needs to be reset (probably use two action listeners)
+				// wait a minute what happens when they click a button since the move timer needs to be reset (probably use two action listeners) (oh that doesn't work either since this is main screw threads)
 				Thread.sleep(1000);
 			}
 		}
