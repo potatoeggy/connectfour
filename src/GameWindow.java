@@ -176,7 +176,9 @@ public class GameWindow extends JPanel implements ActionListener {
 
 	public void setTimer(int moveTimerRemaining) {
 		if (moveTimerRemaining >= 0) { // sanity checking just in case things break in MainWindow (it shouldn't but you never know)
-			this.moveTimer.setText("" + moveTimerRemaining);
+			this.moveTimer.setText("Time: " + moveTimerRemaining);
+		} else {
+			this.moveTimer.setText(null);
 		}
 	}
 

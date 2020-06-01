@@ -99,7 +99,7 @@ public class MainWindow extends JFrame implements ActionListener {
 			transition(newGameMenu, gameWindow);
 		} else if (e.equals(newGameMenu.buttons[1])) {
 			optionsToNew = true;
-			transition(newGameMenu, optionsMenu); // TODO: make sure game is paused when transitioning so move timers don't run and all that
+			transition(newGameMenu, optionsMenu);
 		} else if (e.equals(newGameMenu.buttons[2])) {
 			transition(newGameMenu, mainMenu);
 		}
@@ -107,6 +107,7 @@ public class MainWindow extends JFrame implements ActionListener {
 		// options menu interactions
 		else if (e.equals(optionsMenu.okButton)) {
 			this.moveTimerFull = optionsMenu.getTimer();
+			this.moveTimerInternal = moveTimerFull;
 			this.cpuDifficulty = optionsMenu.getDifficulty();
 			transition(optionsMenu, optionsToNew ? newGameMenu : gameWindow);
 		}
@@ -125,7 +126,6 @@ public class MainWindow extends JFrame implements ActionListener {
 			transition(gameWindow, newGameMenu);
 		}
 	}
-	// TODO: implement dark mode
 
 	public static void main(String[] args) throws InterruptedException {
 		for (String s : new String[] {
@@ -141,8 +141,8 @@ public class MainWindow extends JFrame implements ActionListener {
 
 		while (win.isVisible()) { // exit when window is closed
 			int currentPlayer = win.gameWindow.getCurrentPlayer();
-			while (win.gameWindow.isVisible() && win.moveTimerFull > 0) { // do not run timer when game is not ongoing
-				if (currentPlayer != win.gameWindow.getCurrentPlayer()) {
+			while (win.gameWindow.isVisible() && win.moveTimerFull >= 0) { // do not run timer when game is not ongoing
+				if (currentPlayer != win.gameWindow.getCurrentPlayer()) { // players have switched, reset timer
 					currentPlayer = win.gameWindow.getCurrentPlayer();
 					win.moveTimerInternal = win.moveTimerFull;
 				}
@@ -151,7 +151,6 @@ public class MainWindow extends JFrame implements ActionListener {
 				}
 				win.moveTimerInternal--;
 				win.gameWindow.setTimer(win.moveTimerInternal); // update label in window
-				// wait a minute what happens when they click a button since the move timer needs to be reset (probably use two action listeners) (oh that doesn't work either since this is main screw threads)
 				Thread.sleep(1000);
 				// TODO: if move timer is used reset it when game is over
 			}

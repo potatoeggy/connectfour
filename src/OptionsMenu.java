@@ -83,10 +83,10 @@ public class OptionsMenu extends JPanel implements ActionListener { // how do di
 	} // end actionPerformed
 
 	public int getDifficulty() {
-		return moveTimerSelect.getSelectedIndex();
+		return difficultySelect.getSelectedIndex();
 	}
 
 	public int getTimer() {
-		return Integer.parseInt(((String) moveTimerSelect.getSelectedItem()).substring(0, 2)) + 1; // returns it in seconds by parsing menu item
+		return moveTimerEnabler.isEnabled() ? Integer.parseInt(((String) moveTimerSelect.getSelectedItem()).substring(0, 2).trim()) + 1 : -1; // returns it in seconds by parsing menu item
 	}
 }
