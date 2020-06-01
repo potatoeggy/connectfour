@@ -66,7 +66,7 @@ public class AI {
 				coordinate curr = q.poll();
 
 				//find the correct color
-				int color = (curr.color % 10) == 0 ? curr.color / 10 : curr.color % 10;
+				int color = (curr.color % 10) == 0 ? curr.color / 10 : curr.color;
 
 				//ending is unblocked?
 				int trueRowSize = curr.startBlocked ? 1 : 0;
@@ -128,15 +128,14 @@ public class AI {
 					}
 				}
 			}
-			for (int j = 5; j < b.H; j++) {
+			for (int j = 5; j >= 0; j--) {
 				if (board[j][i] == 0) break;
 				if (board[j][i] == 1) placementScore += 4 - Math.abs(3 - i);
 				else placementScore -= 4 - Math.abs(3 - i);
 			}
 		}
-		//System.out.println(rowSize + " " + ai + " " + p);
 		//returns negative if player has more consecutive chips than AI
-		return rowSize * (ai - p) + placementScore;
+		return (rowSize * (ai - p)) * 2 + placementScore;
 	}
 
 	static ArrayList<Integer> minMax(Board board, int depth, int player, int alpha, int beta) {
@@ -150,37 +149,37 @@ public class AI {
 
 			int x = nextEmpty(b, i); //next empty spot in column i
 			if (x == -1) { //if out of empty spaces continue
-				value.add(player == 1 ? Integer.MIN_VALUE : Integer.MAX_VALUE);
 				continue;
 			}
 			b.board[x][i] = player; //try the position
 
 			//recur until depth is 0
 			if (depth != 0) {
-				if (player == 1) { //AI - find largest value
-					value.addAll(minMax(b, depth - 1, 2, alpha, beta));
+				if (player == 2) { //AI - find largest value
+					value.addAll(minMax(b, depth - 1, 1, alpha, beta));
 					int max = Integer.MIN_VALUE;
 					for (int j : value) {
 						max = Math.max(max, j);
 					}
 					ans.add(max);
-					alpha = Math.max(alpha, max);
+					beta = Math.min(beta, max);
 
 				} else { //Player - find smallest value
-					value.addAll(minMax(b, depth - 1, 1, alpha, beta));
+					value.addAll(minMax(b, depth - 1, 2, alpha, beta));
 					int min = Integer.MAX_VALUE;
 					for (int j : value) {
 						min = Math.min(min, j);
 					}
 					ans.add(min);
-					beta = Math.min(beta, min);
+					alpha = Math.max(alpha, min);
 				}
 				//Alpha-Beta pruning
 				if (beta <= alpha) break;
 			} else {
 				ans.add(scoreGen(b.board));
-				//System.out.println(ans.get(i)); //debug
+				System.out.println(ans.get(i)); //debug
 			} //generate score for moves
+			AITest.printBoard(b);
 		}
 		return ans;
 	}
