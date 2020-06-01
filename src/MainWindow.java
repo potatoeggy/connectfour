@@ -106,8 +106,11 @@ public class MainWindow extends JFrame implements ActionListener {
 
 		// options menu interactions
 		else if (e.equals(optionsMenu.okButton)) {
-			this.moveTimerFull = optionsMenu.getTimer();
-			this.moveTimerInternal = moveTimerFull;
+			if (this.moveTimerFull != optionsMenu.getTimer()) { // only update timer if things change otherwise the timer resets when we enter options
+				this.moveTimerFull = optionsMenu.getTimer();
+				this.moveTimerInternal = moveTimerFull;
+			}
+			this.gameWindow.setTimer(moveTimerInternal);
 			this.cpuDifficulty = optionsMenu.getDifficulty();
 			transition(optionsMenu, optionsToNew ? newGameMenu : gameWindow);
 		}
@@ -141,15 +144,15 @@ public class MainWindow extends JFrame implements ActionListener {
 
 		while (win.isVisible()) { // exit when window is closed
 			int currentPlayer = win.gameWindow.getCurrentPlayer();
-			while (win.gameWindow.isVisible() && win.moveTimerFull >= 0) { // do not run timer when game is not ongoing
+			while (win.gameWindow.isVisible() && win.moveTimerFull > 0) { // do not run timer when game is not ongoing
 				if (currentPlayer != win.gameWindow.getCurrentPlayer()) { // players have switched, reset timer
 					currentPlayer = win.gameWindow.getCurrentPlayer();
 					win.moveTimerInternal = win.moveTimerFull;
 				}
+				win.moveTimerInternal--;
 				if (win.moveTimerInternal == 0) {
 					System.out.println("time's up");
 				}
-				win.moveTimerInternal--;
 				win.gameWindow.setTimer(win.moveTimerInternal); // update label in window
 				Thread.sleep(1000);
 				// TODO: if move timer is used reset it when game is over
