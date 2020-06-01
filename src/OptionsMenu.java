@@ -78,15 +78,15 @@ public class OptionsMenu extends JPanel implements ActionListener { // how do di
 	public void actionPerformed(ActionEvent event) {
 		Object e = event.getSource();
 		if (e.equals(moveTimerEnabler)) {
-			moveTimerSelect.setEnabled(moveTimerEnabler.isSelected()); // i hope isSelected does what i think it does
+			moveTimerSelect.setEnabled(moveTimerEnabler.isSelected()); // show extra move timer options if enabled only
 		}
 	} // end actionPerformed
 
 	public int getDifficulty() {
-		return moveTimerSelect.getSelectedIndex();
+		return difficultySelect.getSelectedIndex();
 	}
 
 	public int getTimer() {
-		return Integer.parseInt(((String) moveTimerSelect.getSelectedItem()).substring(0, 2));
+		return moveTimerEnabler.isSelected() ? Integer.parseInt(((String) moveTimerSelect.getSelectedItem()).substring(0, 2).trim()) + 1 : -1; // returns it in seconds by parsing menu item
 	}
 }
