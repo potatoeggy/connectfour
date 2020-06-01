@@ -130,6 +130,13 @@ public class GameWindow extends JPanel implements ActionListener {
 				gameOver = true;
 				// TODO: if implementing move timer pause it
 				// TODO: highlight or make buttons flash?
+				for (int i = 0; i < buttonGrid.length; i++) {
+					for (JButton butt : buttonGrid[i]) {
+						if (!legacyGraphics) butt.setContentAreaFilled(false);
+						butt.setRolloverEnabled(false);
+						butt.removeActionListener(this);
+					}
+				}
 			} else {
 				currentPlayer *= -1;
 				gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + "'s turn");
