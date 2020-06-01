@@ -140,10 +140,16 @@ public class MainWindow extends JFrame implements ActionListener {
 		win.setVisible(true);
 
 		while (win.isVisible()) { // exit when window is closed
-			while (win.gameWindow.isVisible()) { // do not run timer when game is not ongoing
-				if (win.moveTimerInternal == 0) { // TODO: lose or play random piece
+			int currentPlayer = win.gameWindow.getCurrentPlayer();
+			while (win.gameWindow.isVisible() && win.moveTimerFull > 0) { // do not run timer when game is not ongoing
+				if (currentPlayer != win.gameWindow.getCurrentPlayer()) {
+					currentPlayer = win.gameWindow.getCurrentPlayer();
 					win.moveTimerInternal = win.moveTimerFull;
 				}
+				if (win.moveTimerInternal == 0) {
+					System.out.println("time's up");
+				}
+				win.moveTimerInternal--;
 				win.gameWindow.setTimer(win.moveTimerInternal); // update label in window
 				// wait a minute what happens when they click a button since the move timer needs to be reset (probably use two action listeners) (oh that doesn't work either since this is main screw threads)
 				Thread.sleep(1000);
