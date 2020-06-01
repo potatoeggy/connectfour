@@ -152,6 +152,7 @@ public class GameWindow extends JPanel implements ActionListener {
 					gameStatus.setText(currentPlayer == 1 ? names[0] : names[1] + " is thinking..."); // users don't like not knowing what's happening
 					headerButtons[0].setEnabled(false);
 					buttonGrid[0][AI.bestColumn(board, cpuDifficulty, currentPlayer)].doClick();
+					headerButtons[1].setEnabled(true);
 				} else {
 					gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + "'s turn"); // update header
 				}
