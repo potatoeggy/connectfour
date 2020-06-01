@@ -208,17 +208,12 @@ public class AI {
 		}
 		ArrayList<Integer> bestRows = minMax(board, depth, player, Integer.MIN_VALUE, Integer.MAX_VALUE); // grab value from big algorithm
 		bestIndex = 0;
-		bestScore = Integer.MAX_VALUE;
-		for (int i = 0; i < bestRows.size() && i < board.W; i++) { // iterate and find highest value
-			if (nextEmpty(board, i) == -1) {
-				i--;
-				continue;
-			}
+		bestScore = bestRows.get(0);
+		for (int i = 1; i < bestRows.size() && i < board.W; i++) { // iterate and find highest value
 			if (bestRows.get(i) > bestScore) {
 				bestScore = bestRows.get(i);
 				bestIndex = i;
 			}
-			i++;
 		}
 		return bestIndex; // return to gui
 	}
