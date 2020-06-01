@@ -144,7 +144,7 @@ public class MainWindow extends JFrame implements ActionListener {
 
 		while (win.isVisible()) { // exit when window is closed
 			int currentPlayer = win.gameWindow.getCurrentPlayer();
-			while (win.gameWindow.isVisible() && win.moveTimerFull > 0) { // do not run timer when game is not ongoing
+			while (win.gameWindow.isVisible() && win.moveTimerFull > 0 && !win.gameWindow.isGameOver()) { // do not run timer when game is not ongoing
 				if (currentPlayer != win.gameWindow.getCurrentPlayer()) { // players have switched, reset timer
 					currentPlayer = win.gameWindow.getCurrentPlayer();
 					win.moveTimerInternal = win.moveTimerFull;
