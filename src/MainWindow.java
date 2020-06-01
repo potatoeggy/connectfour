@@ -151,12 +151,14 @@ public class MainWindow extends JFrame implements ActionListener {
 					win.moveTimerInternal = win.moveTimerFull;
 				}
 				win.moveTimerInternal--;
-				if (win.moveTimerInternal == 0) {
-					System.out.println("time's up");
+				if (win.moveTimerInternal == 0) { // when time runs out
+					win.gameWindow.endGame(-1 * win.gameWindow.getCurrentPlayer()); // opposite player wins
 				}
 				win.gameWindow.setTimer(win.moveTimerInternal); // update label in window
 				Thread.sleep(1000);
-				// TODO: if move timer is used reset it when game is over
+			}
+			if (win.gameWindow.isGameOver()) {
+				win.moveTimerInternal = win.moveTimerFull;
 			}
 		}
 	}

@@ -142,11 +142,9 @@ public class GameWindow extends JPanel implements ActionListener {
 			buttonsFilled++;
 
 			if (board.checkWin(row, column, currentPlayer)) { // check if a player wins
-				endGame();
-				gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + " wins!"); // display whoever wins
-				// TODO: highlight or make buttons flash?
+				endGame(currentPlayer);
 			} else if (buttonsFilled >= 42) { // it's a tie
-				endGame();
+				endGame(0);
 			} else {
 				currentPlayer *= -1; // switch player
 				gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + "'s turn"); // update header
@@ -155,7 +153,7 @@ public class GameWindow extends JPanel implements ActionListener {
 		}
 	}
 
-	public void endGame() { // handles game ending procedures
+	public void endGame(int winningPlayer) { // handles game ending procedures
 		for (int i = 0; i < buttonGrid.length; i++) {
 			for (JButton butt : buttonGrid[i]) { // "disable" all grid buttons
 				if (!legacyGraphics) butt.setContentAreaFilled(false);
@@ -164,7 +162,11 @@ public class GameWindow extends JPanel implements ActionListener {
 			}
 		}
 		headerButtons[0].setText("Quit"); // do not save when game is over
-		gameStatus.setText("It's a draw!");
+		if (winningPlayer == 0) {
+			gameStatus.setText("It's a draw!");
+		} else {
+			gameStatus.setText((winningPlayer == 1 ? names[0] : names[1]) + " wins!"); // display whoever wins
+		}
 		gameStatus.setBackground(null); // remove colour because it's no-one's turn
 		gameOver = true;
 	}
