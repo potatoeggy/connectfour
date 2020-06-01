@@ -25,6 +25,7 @@ public class GameWindow extends JPanel implements ActionListener {
 	private int currentPlayer, cpuDifficulty;
 	private int[] players;
 	private String[] names;
+	private int buttonsFilled; // when at top the game is a tie
 
 	public GameWindow(ActionListener eventHandler) {
 		legacyGraphics = false;
@@ -34,6 +35,8 @@ public class GameWindow extends JPanel implements ActionListener {
 		cpuDifficulty = 0;
 		players = new int[2];
 		names = new String[] {"Player 1", "Player 2"};
+		buttonsFilled = 0;
+
 		header = new JPanel();
 		headerJustification = new JPanel[]{new JPanel(), new JPanel(), new JPanel()};
 		body = new JPanel();
@@ -84,14 +87,12 @@ public class GameWindow extends JPanel implements ActionListener {
 				buttonGrid[i][j].addMouseListener(new MouseAdapter() {
 					public void mouseEntered(MouseEvent event) { // highlight column when mouse goes over things
 						int y = (Integer) (((JButton) event.getSource()).getClientProperty("y"));
-						buttonGrid[0][y].setIcon(arrow);
-						revalidate();
-						repaint();
+						if (!gameOver) buttonGrid[0][y].setIcon(arrow);
 					}
 
 					public void mouseExited(MouseEvent event) { // get rid of highlight when mouse leaves
 						int y = (Integer) (((JButton) event.getSource()).getClientProperty("y"));
-						buttonGrid[0][y].setIcon(null);
+						if (!gameOver) buttonGrid[0][y].setIcon(null);
 					}
 				});
 				body.add(buttonGrid[i][j]);
@@ -123,25 +124,33 @@ public class GameWindow extends JPanel implements ActionListener {
 			buttonGrid[row+1][column].setRolloverEnabled(false);
 			if (!legacyGraphics) buttonGrid[row+1][column].setContentAreaFilled(false); // "disable" button because setEnabled is garbage and makes everything gray
 			buttonGrid[row+1][column].removeActionListener(this);
+			buttonsFilled++;
 
 			if (board.checkWin(row, column, currentPlayer)) { // check if a player wins
+				endGame();
 				gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + " wins!");
-				headerButtons[0].setText("Quit");
-				gameOver = true;
-				// TODO: if implementing move timer pause it
 				// TODO: highlight or make buttons flash?
-				for (int i = 0; i < buttonGrid.length; i++) {
-					for (JButton butt : buttonGrid[i]) {
-						if (!legacyGraphics) butt.setContentAreaFilled(false);
-						butt.setRolloverEnabled(false);
-						butt.removeActionListener(this);
-					}
-				}
+			} else if (buttonsFilled >= 42) {
+				endGame();
 			} else {
 				currentPlayer *= -1;
 				gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + "'s turn");
 			}
 		}
+	}
+
+	public void endGame() {
+		for (int i = 0; i < buttonGrid.length; i++) {
+			for (JButton butt : buttonGrid[i]) {
+				if (!legacyGraphics) butt.setContentAreaFilled(false);
+				butt.setRolloverEnabled(false);
+				butt.removeActionListener(this);
+			}
+		}
+		headerButtons[0].setText("Quit");
+		gameStatus.setText("It's a draw!");
+		gameOver = true;
+		// TODO: if implementing move timer pause it
 	}
 
 	public boolean isGameOver() {
