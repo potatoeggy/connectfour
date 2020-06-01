@@ -69,6 +69,9 @@ public class GameWindow extends JPanel implements ActionListener {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println("One or more necessary resources were not found. Falling back to legacy graphics.");
+			arrow = new ImageIcon(); // just in case to prevent null pointers
+			redPiece = new ImageIcon();
+			yellowPiece = new ImageIcon();
 			legacyGraphics = true; // just set their background then
 		}
 
