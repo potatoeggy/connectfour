@@ -169,8 +169,18 @@ public class AI {
 	}
 
 	// utility function maintained by daniel to act as a stable interface between Ai and gui
-	static int bestColumn(Board board, int depth, int player) {
+	static int bestColumn(Board board, int difficulty, int player) {
 		int bestIndex, bestScore;
+		int depth = 0;
+		if (difficulty == 0) {
+			return (int) (Math.random() * 7); // it's incredibly easy
+		} else if (difficulty == 1) { // modify depth based on current difficulty
+			depth = 3;
+		} else if (difficulty == 2) {
+			depth = 4;
+		} else {
+			depth = 5; // do NOT use until ai is more optimised
+		}
 		int[] bestRows = minMax(board, depth, player);
 		bestIndex = 0;
 		bestScore = bestRows[0];
