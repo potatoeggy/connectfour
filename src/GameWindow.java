@@ -149,7 +149,9 @@ public class GameWindow extends JPanel implements ActionListener {
 				currentPlayer *= -1; // switch player
 				gameStatus.setBackground(currentPlayer == 1 ? Color.RED : Color.YELLOW); // give visual indication of turn
 				if (players[currentPlayer == 1 ? 0 : 1] == 1) {
-					gameStatus.setText(currentPlayer == 1 ? names[0] : names[1] + "is thinking..."); // users don't like not knowing what's happening
+					gameStatus.setText(currentPlayer == 1 ? names[0] : names[1] + " is thinking..."); // users don't like not knowing what's happening
+					headerButtons[0].setEnabled(false);
+					buttonGrid[0][AI.bestColumn(board, cpuDifficulty, currentPlayer)].doClick();
 				} else {
 					gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + "'s turn"); // update header
 				}
