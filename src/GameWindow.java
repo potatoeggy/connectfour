@@ -21,9 +21,9 @@ public class GameWindow extends JPanel implements ActionListener {
 	private boolean gameOver;
 
 	// internal game variables copied from MainWindow
-	private Board board;
+	private Board board; // internal board
 	private int currentPlayer, cpuDifficulty;
-	private int[] players;
+	private int[] players; // actually it means player *types*
 	private String[] names;
 	private int buttonsFilled; // when at top the game is a tie
 
@@ -46,18 +46,18 @@ public class GameWindow extends JPanel implements ActionListener {
 		gameStatus = new JLabel(names[0] + "'s turn");
 		moveTimer = new JLabel();
 
-		gameStatus.setFont(new Font("sans-serif", Font.BOLD, 18));
+		gameStatus.setFont(new Font("sans-serif", Font.BOLD, 18)); // make it big and bold
 		gameStatus.setBackground(Color.RED); // TODO: remember to handle colour backgrounds when loading saves
-		gameStatus.setOpaque(true);
+		gameStatus.setOpaque(true); // support filling in backgrounds
 
-		try {
+		try { // try to load fancy pictures
 			arrow = new ImageIcon(ImageIO.read(getClass().getResource("resources/arrow.png")));
 			redPiece = new ImageIcon(ImageIO.read(getClass().getResource("resources/red.png")));
 			yellowPiece = new ImageIcon(ImageIO.read(getClass().getResource("resources/yellow.png")));
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println("One or more necessary resources were not found. Falling back to legacy graphics.");
-			legacyGraphics = true;
+			legacyGraphics = true; // just set their background then
 		}
 
 		for (JButton butt : headerButtons) {
@@ -82,18 +82,17 @@ public class GameWindow extends JPanel implements ActionListener {
 				buttonGrid[i][j] = new JButton("<html><br><br><br><br><br><br></html>"); // make multi-line buttons
 				buttonGrid[i][j].addActionListener(this);
 				buttonGrid[i][j].setBorder(BorderFactory.createLineBorder(Color.BLACK)); // create a grid
-				buttonGrid[i][j].putClientProperty("x", i); // store coordinates
-				buttonGrid[i][j].putClientProperty("y", j);
+				buttonGrid[i][j].putClientProperty("column", j); // store coords
 				buttonGrid[i][j].setBackground(Color.WHITE); // make pretty
 				buttonGrid[i][j].setFocusPainted(false); // do not have ugly lines
 				buttonGrid[i][j].addMouseListener(new MouseAdapter() {
 					public void mouseEntered(MouseEvent event) { // highlight column when mouse goes over things
-						int y = (Integer) (((JButton) event.getSource()).getClientProperty("y"));
+						int y = (Integer) (((JButton) event.getSource()).getClientProperty("column"));
 						if (!gameOver) buttonGrid[0][y].setIcon(arrow);
 					}
 
 					public void mouseExited(MouseEvent event) { // get rid of highlight when mouse leaves
-						int y = (Integer) (((JButton) event.getSource()).getClientProperty("y"));
+						int y = (Integer) (((JButton) event.getSource()).getClientProperty("column"));
 						if (!gameOver) buttonGrid[0][y].setIcon(null);
 					}
 				});
@@ -110,29 +109,28 @@ public class GameWindow extends JPanel implements ActionListener {
 		add(body);
 		header.setLayout(new GridLayout(1, 3));
 		body.setLayout(new GridLayout(7, 7, -1, -1));
-		body.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+		body.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2)); // make margins
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		setVisible(false);
 	}
 
 	public void actionPerformed(ActionEvent event) {
-		if (gameOver) return;
-		int column = (Integer) (((JButton) event.getSource()).getClientProperty("y"));
-		int row = board.addChip(column, currentPlayer);
+		int column = (Integer) (((JButton) event.getSource()).getClientProperty("column"));
+		int row = board.addChip(column, currentPlayer); // at least try to add chips
 		if (row != -1) {
 			buttonGrid[row+1][column].setBackground(currentPlayer == 1 ? Color.RED : Color.YELLOW); // unfortunately used to determine if something is occupying the square
 			buttonGrid[row+1][column].setText(null); // centre icon
-			buttonGrid[row+1][column].setIcon(currentPlayer == 1 ? redPiece : yellowPiece); // make it known to user (no idea how to force square gridlayouts)
-			buttonGrid[row+1][column].setRolloverEnabled(false);
-			if (!legacyGraphics) buttonGrid[row+1][column].setContentAreaFilled(false); // "disable" button because setEnabled is garbage and makes everything gray
+			buttonGrid[row+1][column].setIcon(currentPlayer == 1 ? redPiece : yellowPiece); // give player a pretty piece
+			buttonGrid[row+1][column].setRolloverEnabled(false); // "disable" button because setEnabled is garbage and makes everything gray
+			if (!legacyGraphics) buttonGrid[row+1][column].setContentAreaFilled(false);
 			buttonGrid[row+1][column].removeActionListener(this);
 			buttonsFilled++;
 
 			if (board.checkWin(row, column, currentPlayer)) { // check if a player wins
 				endGame();
-				gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + " wins!");
+				gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + " wins!"); // display whoever wins
 				// TODO: highlight or make buttons flash?
-			} else if (buttonsFilled >= 42) {
+			} else if (buttonsFilled >= 42) { // it's a tie
 				endGame();
 			} else {
 				currentPlayer *= -1; // switch player
@@ -142,19 +140,18 @@ public class GameWindow extends JPanel implements ActionListener {
 		}
 	}
 
-	public void endGame() {
+	public void endGame() { // handles game ending procedures
 		for (int i = 0; i < buttonGrid.length; i++) {
-			for (JButton butt : buttonGrid[i]) {
+			for (JButton butt : buttonGrid[i]) { // "disable" all grid buttons
 				if (!legacyGraphics) butt.setContentAreaFilled(false);
 				butt.setRolloverEnabled(false);
 				butt.removeActionListener(this);
 			}
 		}
-		headerButtons[0].setText("Quit");
+		headerButtons[0].setText("Quit"); // do not save when game is over
 		gameStatus.setText("It's a draw!");
-		gameStatus.setBackground(null);
+		gameStatus.setBackground(null); // remove colour because it's no-one's turn
 		gameOver = true;
-		// TODO: if implementing move timer pause it
 	}
 
 	public boolean isGameOver() {
@@ -166,7 +163,7 @@ public class GameWindow extends JPanel implements ActionListener {
 	}
 
 	public void setTimer(int moveTimerRemaining) {
-		if (moveTimerRemaining > 0) {
+		if (moveTimerRemaining > 0) { // sanity checking just in case things break in MainWindow (it shouldn't but you never know)
 			this.moveTimer.setText("" + moveTimerRemaining);
 		}
 	}

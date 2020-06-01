@@ -78,7 +78,7 @@ public class OptionsMenu extends JPanel implements ActionListener { // how do di
 	public void actionPerformed(ActionEvent event) {
 		Object e = event.getSource();
 		if (e.equals(moveTimerEnabler)) {
-			moveTimerSelect.setEnabled(moveTimerEnabler.isSelected()); // i hope isSelected does what i think it does
+			moveTimerSelect.setEnabled(moveTimerEnabler.isSelected()); // show extra move timer options if enabled only
 		}
 	} // end actionPerformed
 
@@ -87,6 +87,6 @@ public class OptionsMenu extends JPanel implements ActionListener { // how do di
 	}
 
 	public int getTimer() {
-		return Integer.parseInt(((String) moveTimerSelect.getSelectedItem()).substring(0, 2));
+		return Integer.parseInt(((String) moveTimerSelect.getSelectedItem()).substring(0, 2)); // returns it in seconds by parsing menu item
 	}
 }

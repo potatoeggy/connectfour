@@ -89,6 +89,8 @@ public class MainWindow extends JFrame implements ActionListener {
 			names = newGameMenu.getNames();
 			players = newGameMenu.getPlayers();
 			gameWindow = new GameWindow(this);
+
+			// pass information from new game and options, if configured
 			gameWindow.setNames(names);
 			gameWindow.setPlayers(players);
 			gameWindow.setTimer(moveTimerInternal);
@@ -132,19 +134,20 @@ public class MainWindow extends JFrame implements ActionListener {
 			"ComboBox",
 			"Panel"
 		}) {
-			UIManager.getLookAndFeelDefaults().put(s + ".background", Color.WHITE);
+			UIManager.getLookAndFeelDefaults().put(s + ".background", Color.WHITE); // change default to make pretty
 		}
 		MainWindow win = new MainWindow();
 		win.setVisible(true);
 
-		while (win.isVisible()) {
-			while (win.gameWindow.isVisible()) {
-				if (win.moveTimerInternal == 0) { // lose or play random piece
+		while (win.isVisible()) { // exit when window is closed
+			while (win.gameWindow.isVisible()) { // do not run timer when game is not ongoing
+				if (win.moveTimerInternal == 0) { // TODO: lose or play random piece
 					win.moveTimerInternal = win.moveTimerFull;
 				}
-				win.gameWindow.setTimer(win.moveTimerInternal);
+				win.gameWindow.setTimer(win.moveTimerInternal); // update label in window
 				// wait a minute what happens when they click a button since the move timer needs to be reset (probably use two action listeners) (oh that doesn't work either since this is main screw threads)
 				Thread.sleep(1000);
+				// TODO: if move timer is used reset it when game is over
 			}
 		}
 	}
