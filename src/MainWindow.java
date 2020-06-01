@@ -137,7 +137,7 @@ public class MainWindow extends JFrame implements ActionListener {
 		MainWindow win = new MainWindow();
 		win.setVisible(true);
 
-		while (true) {
+		while (win.isVisible()) {
 			while (win.gameWindow.isVisible()) {
 				if (win.moveTimerInternal == 0) { // lose or play random piece
 					win.moveTimerInternal = win.moveTimerFull;

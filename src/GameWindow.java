@@ -47,6 +47,8 @@ public class GameWindow extends JPanel implements ActionListener {
 		moveTimer = new JLabel();
 
 		gameStatus.setFont(new Font("sans-serif", Font.BOLD, 18));
+		gameStatus.setBackground(Color.RED); // TODO: remember to handle colour backgrounds when loading saves
+		gameStatus.setOpaque(true);
 
 		try {
 			arrow = new ImageIcon(ImageIO.read(getClass().getResource("resources/arrow.png")));
@@ -133,8 +135,9 @@ public class GameWindow extends JPanel implements ActionListener {
 			} else if (buttonsFilled >= 42) {
 				endGame();
 			} else {
-				currentPlayer *= -1;
-				gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + "'s turn");
+				currentPlayer *= -1; // switch player
+				gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + "'s turn"); // update header
+				gameStatus.setBackground(currentPlayer == 1 ? Color.RED : Color.YELLOW); // give visual indication of turn
 			}
 		}
 	}
@@ -149,6 +152,7 @@ public class GameWindow extends JPanel implements ActionListener {
 		}
 		headerButtons[0].setText("Quit");
 		gameStatus.setText("It's a draw!");
+		gameStatus.setBackground(null);
 		gameOver = true;
 		// TODO: if implementing move timer pause it
 	}
