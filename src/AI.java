@@ -192,6 +192,35 @@ public class AI {
 		return ans;
 	}
 
+	// utility function maintained by potatoeggy to act as a stable interface between Ai and gui
+	static int bestColumn(Board board, int difficulty, int player) {
+		int bestIndex, bestScore;
+		int depth = 0;
+		if (difficulty == 0) {
+			return (int) (Math.random() * 7); // it's incredibly easy
+		} else if (difficulty == 1) { // modify depth based on current difficulty
+			depth = 3;
+		} else if (difficulty == 2) {
+			depth = 4;
+		} else {
+			depth = 5; // do NOT use until ai is more optimised
+		}
+		ArrayList<Integer> bestRows = minMax(board, depth, player, Integer.MIN_VALUE, Integer.MAX_VALUE); // grab value from big algorithm
+		bestIndex = 0;
+		bestScore = Integer.MAX_VALUE;
+		for (int i = 0, col = 0; i < bestRows.size(), col < board.W; i++, col++) { // iterate and find highest value
+			if (nextEmpty(board, col) == -1) {
+				i--;
+				continue;
+			}
+			if (bestRows.get(i) > bestScore) {
+				bestScore = bestRows.get(i);
+				bestIndex = col;
+			}
+		}
+		return bestIndex; // return to gui
+	}
+
 	//utility function to find next empty position in a column
 	static int nextEmpty(Board board, int col) {
 		for (int i = board.H - 1; i >= 0; i--) {
