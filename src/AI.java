@@ -144,7 +144,7 @@ public class AI {
 
 		for (int i = 0; i < board.W; i++) {
 			Board b = new Board(); //copy of board
-			ArrayList<Integer> value = new ArrayList<>(); //value of each move
+			ArrayList<Integer> value = new ArrayList<Integer>(); //value of each move
 
 			b.board = new int[b.H][b.W];
 			for (int j = 0; j < b.H; j++) b.board[j] = Arrays.copyOf(board.board[j], b.W);
@@ -187,6 +187,7 @@ public class AI {
 				//System.out.println(ans.get(i)); //debug
       
 			//AITest.printBoard(b); //debug
+			}
 
 		}
 		return ans;
@@ -208,15 +209,16 @@ public class AI {
 		ArrayList<Integer> bestRows = minMax(board, depth, player, Integer.MIN_VALUE, Integer.MAX_VALUE); // grab value from big algorithm
 		bestIndex = 0;
 		bestScore = Integer.MAX_VALUE;
-		for (int i = 0, col = 0; i < bestRows.size(), col < board.W; i++, col++) { // iterate and find highest value
-			if (nextEmpty(board, col) == -1) {
+		for (int i = 0; i < bestRows.size() && i < board.W; i++) { // iterate and find highest value
+			if (nextEmpty(board, i) == -1) {
 				i--;
 				continue;
 			}
 			if (bestRows.get(i) > bestScore) {
 				bestScore = bestRows.get(i);
-				bestIndex = col;
+				bestIndex = i;
 			}
+			i++;
 		}
 		return bestIndex; // return to gui
 	}
