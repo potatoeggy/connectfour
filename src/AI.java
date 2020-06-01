@@ -168,6 +168,21 @@ public class AI {
 		return ans;
 	}
 
+	// utility function maintained by daniel to act as a stable interface between Ai and gui
+	static int bestColumn(Board board, int depth, int player) {
+		int bestIndex, bestScore;
+		int[] bestRows = minMax(board, depth, player);
+		bestIndex = 0;
+		bestScore = bestRows[0];
+		for (int i = 1; i < bestRows.length; i++) {
+			if (bestRows[i] > bestScore) {
+				bestScore = bestRows[i];
+				bestIndex = i;
+			}
+		}
+		return bestIndex;
+	}
+
 	//utility function to find next empty position in a column
 	static int nextEmpty(Board board, int col) {
 		for (int i = board.H - 1; i >= 0; i--) {
