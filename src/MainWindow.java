@@ -124,7 +124,7 @@ public class MainWindow extends JFrame implements ActionListener {
 			if (!gameWindow.isGameOver()) {
 				// TODO: save
 			}
-			transition(gameWindow, mainMenu);
+			dispose();
 		} else if (e.equals(gameWindow.headerButtons[1])) {
 			transition(gameWindow, newGameMenu);
 		}
