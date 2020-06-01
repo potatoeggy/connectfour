@@ -52,6 +52,9 @@ public class AI {
 		ArrayList<Integer[]> foundRows = new ArrayList<>();
 		int xStart, yStart;
 
+		//variable to keep count of score for chips closer to center
+		int placementScore = 0;
+
 		for (int i = 0; i < b.W; i++) { //loops through all columns in case there is a gap
 			PriorityQueue<coordinate> q = new PriorityQueue<>();
 			if (board[b.H - 1][i] == 0) continue; //if this place is empty
@@ -62,8 +65,8 @@ public class AI {
 			while (!q.isEmpty()) {
 				coordinate curr = q.poll();
 
-				//find the correct color
-				int color = (curr.color % 10) == 0 ? curr.color / 10 : curr.color % 10;
+				//find the actual color - if it's divisible by 10, then this is a gap
+				int color = (curr.color % 10) == 0 ? curr.color / 10 : curr.color;
 
 				//ending is unblocked?
 				int trueRowSize = curr.startBlocked ? 1 : 0;
@@ -125,47 +128,97 @@ public class AI {
 					}
 				}
 			}
+      
+			for (int j = 5; j >= 0; j--) {
+				if (board[j][i] == 0) break;
+				if (board[j][i] == 1) placementScore += 4 - Math.abs(3 - i);
+				else placementScore -= 4 - Math.abs(3 - i);
+			}
 		}
-		System.out.println(rowSize + " " + ai + " " + p);
 		//returns negative if player has more consecutive chips than AI
-		return rowSize * (ai - p);
+		return (rowSize * (ai - p)) * 2 + placementScore;
 	}
 
-	static int[] minMax(Board board, int depth, int player) {
-		int ans[] = new int[7]; //best answer for current player
+	static ArrayList<Integer> minMax(Board board, int depth, int player, int alpha, int beta) {
+		ArrayList<Integer> ans = new ArrayList<>(); //best answer for current player
 
 		for (int i = 0; i < board.W; i++) {
 			Board b = new Board(); //copy of board
-			int value[]; //value of each move
+			ArrayList<Integer> value = new ArrayList<>(); //value of each move
+
 			b.board = new int[b.H][b.W];
 			for (int j = 0; j < b.H; j++) b.board[j] = Arrays.copyOf(board.board[j], b.W);
 
 			int x = nextEmpty(b, i); //next empty spot in column i
+
 			if (x == -1) continue; //if out of empty spaces continue
+
 			b.board[x][i] = player; //try the position
 
 			//recur until depth is 0
 			if (depth != 0) {
-				value = minMax(b, depth - 1, ((player - 1) ^ 1) + 1);
-				if (player == 1) { //AI player - find largest value
+				if (player == 2) { //AI - find largest value
+					value.addAll(minMax(b, depth - 1, 1, alpha, beta));
+
 					int max = Integer.MIN_VALUE;
 					for (int j : value) {
 						max = Math.max(max, j);
 					}
-					ans[i] = max;
+          
+					ans.add(max);
+					beta = Math.min(beta, max);
+
 				} else { //Player - find smallest value
+					value.addAll(minMax(b, depth - 1, 2, alpha, beta));
+
 					int min = Integer.MAX_VALUE;
 					for (int j : value) {
 						min = Math.min(min, j);
 					}
-					ans[i] = min;
+
+					ans.add(min);
+					alpha = Math.max(alpha, min);
 				}
-			} else {
-				ans[i] = scoreGen(b.board);
-				System.out.println(ans[i]); //debug
-			} //generate score for moves
+        
+				//Alpha-Beta pruning
+				if (beta <= alpha) break;
+			 //generate score for moves
+				ans.add(scoreGen(b.board));
+				//System.out.println(ans.get(i)); //debug
+      
+			//AITest.printBoard(b); //debug
+
 		}
 		return ans;
+	}
+
+	// utility function maintained by potatoeggy to act as a stable interface between Ai and gui
+	static int bestColumn(Board board, int difficulty, int player) {
+		int bestIndex, bestScore;
+		int depth = 0;
+		if (difficulty == 0) {
+			return (int) (Math.random() * 7); // it's incredibly easy
+		} else if (difficulty == 1) { // modify depth based on current difficulty
+			depth = 3;
+		} else if (difficulty == 2) {
+			depth = 4;
+		} else {
+			depth = 5; // do NOT use until ai is more optimised
+		}
+		ArrayList<Integer> bestRows = minMax(board, depth, player, Integer.MIN_VALUE, Integer.MAX_VALUE); // grab value from big algorithm
+		bestIndex = 0;
+		bestScore = Integer.MAX_VALUE;
+		for (int i = 0, col = 0; i < bestRows.size(), col < board.W; i++, col++) { // iterate and find highest value
+			if (nextEmpty(board, col) == -1) {
+				i--;
+				continue;
+			}
+			if (bestRows.get(i) > bestScore) {
+				bestScore = bestRows.get(i);
+				bestIndex = col;
+			}
+		}
+		return bestIndex; // return to gui
 	}
 
 	//utility function to find next empty position in a column
