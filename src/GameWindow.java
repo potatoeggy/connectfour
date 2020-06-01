@@ -105,7 +105,7 @@ public class GameWindow extends JPanel implements ActionListener {
 
 					public void mouseExited(MouseEvent event) { // get rid of highlight when mouse leaves
 						int y = (Integer) (((JButton) event.getSource()).getClientProperty("column"));
-						if (!gameOver) buttonGrid[0][y].setIcon(null);
+						buttonGrid[0][y].setIcon(null);
 					}
 				});
 				body.add(buttonGrid[i][j]);
