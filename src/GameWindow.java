@@ -37,6 +37,7 @@ public class GameWindow extends JPanel implements ActionListener {
 	private int currentPlayer, cpuDifficulty;
 	private int[] players; // actually it means player *types*
 	private String[] names;
+	private int internalTurnCount;
 	private int buttonsFilled; // when at top the game is a tie
 
 	public GameWindow(ActionListener eventHandler) {
@@ -47,6 +48,7 @@ public class GameWindow extends JPanel implements ActionListener {
 		cpuDifficulty = 0;
 		players = new int[2];
 		names = new String[] {"Player 1", "Player 2"};
+		internalTurnCount = 0;
 		buttonsFilled = 0;
 
 		header = new JPanel();
@@ -141,6 +143,7 @@ public class GameWindow extends JPanel implements ActionListener {
 			buttonGrid[row+1][column].removeActionListener(this);
 			buttonsFilled++;
 
+			internalTurnCount++;
 			if (board.checkWin(row, column, currentPlayer)) { // check if a player wins
 				endGame(currentPlayer);
 			} else if (buttonsFilled >= 42) { // it's a tie
@@ -149,15 +152,26 @@ public class GameWindow extends JPanel implements ActionListener {
 				currentPlayer *= -1; // switch player
 				gameStatus.setBackground(currentPlayer == 1 ? Color.RED : Color.YELLOW); // give visual indication of turn
 				if (players[currentPlayer == 1 ? 0 : 1] == 1) {
-					gameStatus.setText(currentPlayer == 1 ? names[0] : names[1] + " is thinking..."); // users don't like not knowing what's happening
+					gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + " is thinking..."); // users don't like not knowing what's happening
 					headerButtons[0].setEnabled(false);
 					buttonGrid[0][AI.bestColumn(board, cpuDifficulty, currentPlayer)].doClick();
-					headerButtons[1].setEnabled(true);
+					headerButtons[0].setEnabled(true);
 				} else {
 					gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + "'s turn"); // update header
 				}
 			}
+		} else if (players[currentPlayer == 1 ? 0 : 1] == 1) {
+			buttonGrid[0][AI.bestColumn(board, cpuDifficulty, currentPlayer)].doClick();
 		}
+	}
+
+	// TODO: disable human clicking while it's the computers turn (or maybe the event lock solves that)
+
+	public void cpuInit() { // if the computer starts the game
+		gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + " is thinking..."); // users don't like not knowing what's happening
+		headerButtons[0].setEnabled(false);
+		buttonGrid[0][AI.bestColumn(board, cpuDifficulty, currentPlayer)].doClick();
+		headerButtons[0].setEnabled(true);
 	}
 
 	public void endGame(int winningPlayer) { // handles game ending procedures
@@ -213,5 +227,9 @@ public class GameWindow extends JPanel implements ActionListener {
 
 	public int getCurrentPlayer() {
 		return this.currentPlayer;
+	}
+
+	public int getTurnCount() {
+		return this.internalTurnCount;
 	}
 }

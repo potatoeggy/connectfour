@@ -30,6 +30,7 @@ public class MainWindow extends JFrame implements ActionListener {
 	private int cpuDifficulty; // 0-3 to pass to AI
 	private int moveTimerInternal; // how much time is left (if negative, infinite) (might be handled by main come to think of it because we need threading)
 	private int moveTimerFull; // what to reset timer to
+	private int internalTurnCount; // not shown to user, used to enforce move timer
 
 
 	public MainWindow() {
@@ -40,6 +41,7 @@ public class MainWindow extends JFrame implements ActionListener {
 		moveTimerFull = -1;
 		players = new int[2];
 		names = new String[] {"Player 1", "Player 2"};
+		internalTurnCount = 0;
 		
 		newGameMenu = new NewGameMenu(this);
 		mainMenu = new MainMenu(this);
@@ -95,6 +97,7 @@ public class MainWindow extends JFrame implements ActionListener {
 			gameWindow.setPlayers(players);
 			gameWindow.setTimer(moveTimerInternal);
 			gameWindow.setDifficulty(cpuDifficulty);
+			if (players[0] == 1) gameWindow.cpuInit();
 			add(gameWindow);
 			transition(newGameMenu, gameWindow);
 		} else if (e.equals(newGameMenu.buttons[1])) {
@@ -146,7 +149,7 @@ public class MainWindow extends JFrame implements ActionListener {
 			int currentPlayer = win.gameWindow.getCurrentPlayer();
 			Thread.sleep(1); // really stupid workaround because for whatever reason we don't enter the next loop sometimes
 			while (win.gameWindow.isVisible() && win.moveTimerFull > 0 && !win.gameWindow.isGameOver()) { // do not run timer when game is not ongoing
-				if (currentPlayer != win.gameWindow.getCurrentPlayer()) { // players have switched, reset timer
+				if (currentPlayer != win.gameWindow.getCurrentPlayer() || win.internalTurnCount != win.gameWindow.getTurnCount()) { // players have switched, reset timer
 					currentPlayer = win.gameWindow.getCurrentPlayer();
 					win.moveTimerInternal = win.moveTimerFull;
 				}
@@ -155,6 +158,7 @@ public class MainWindow extends JFrame implements ActionListener {
 					win.gameWindow.endGame(-1 * win.gameWindow.getCurrentPlayer()); // opposite player wins
 				}
 				win.gameWindow.setTimer(win.moveTimerInternal); // update label in window
+				win.internalTurnCount = win.gameWindow.getTurnCount();
 				Thread.sleep(1000);
 			}
 			if (win.gameWindow.isGameOver()) {
