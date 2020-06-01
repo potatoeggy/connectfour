@@ -65,7 +65,7 @@ public class AI {
 			while (!q.isEmpty()) {
 				coordinate curr = q.poll();
 
-				//find the correct color
+				//find the actual color - if it's divisible by 10, then this is a gap
 				int color = (curr.color % 10) == 0 ? curr.color / 10 : curr.color;
 
 				//ending is unblocked?
@@ -128,6 +128,7 @@ public class AI {
 					}
 				}
 			}
+      
 			for (int j = 5; j >= 0; j--) {
 				if (board[j][i] == 0) break;
 				if (board[j][i] == 1) placementScore += 4 - Math.abs(3 - i);
@@ -144,42 +145,49 @@ public class AI {
 		for (int i = 0; i < board.W; i++) {
 			Board b = new Board(); //copy of board
 			ArrayList<Integer> value = new ArrayList<>(); //value of each move
+
 			b.board = new int[b.H][b.W];
 			for (int j = 0; j < b.H; j++) b.board[j] = Arrays.copyOf(board.board[j], b.W);
 
 			int x = nextEmpty(b, i); //next empty spot in column i
-			if (x == -1) { //if out of empty spaces continue
-				continue;
-			}
+
+			if (x == -1) continue; //if out of empty spaces continue
+
 			b.board[x][i] = player; //try the position
 
 			//recur until depth is 0
 			if (depth != 0) {
 				if (player == 2) { //AI - find largest value
 					value.addAll(minMax(b, depth - 1, 1, alpha, beta));
+
 					int max = Integer.MIN_VALUE;
 					for (int j : value) {
 						max = Math.max(max, j);
 					}
+          
 					ans.add(max);
 					beta = Math.min(beta, max);
 
 				} else { //Player - find smallest value
 					value.addAll(minMax(b, depth - 1, 2, alpha, beta));
+
 					int min = Integer.MAX_VALUE;
 					for (int j : value) {
 						min = Math.min(min, j);
 					}
+
 					ans.add(min);
 					alpha = Math.max(alpha, min);
 				}
+        
 				//Alpha-Beta pruning
 				if (beta <= alpha) break;
-			} else {
+			 //generate score for moves
 				ans.add(scoreGen(b.board));
-				System.out.println(ans.get(i)); //debug
-			} //generate score for moves
-			AITest.printBoard(b);
+				//System.out.println(ans.get(i)); //debug
+      
+			//AITest.printBoard(b); //debug
+
 		}
 		return ans;
 	}

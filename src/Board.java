@@ -46,7 +46,9 @@ public class Board {
 	//returns the row and updates the board
 	public int addChip(int col, int player) {
 		int row = AI.nextEmpty(this, col);
-		board[col][row] = player;
+		if (row != -1) { // if all columns are filled make sure we don't crash
+			board[col][row] = player;
+		}
 		return row;
 	}
 }

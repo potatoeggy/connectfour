@@ -15,8 +15,8 @@ import javax.swing.JPanel;
 
 public class OptionsMenu extends JPanel implements ActionListener { // how do dialogs work I think I'll just use frames and timers instead
 	JButton okButton;
-	JCheckBox moveTimerEnabler; // checkbox to enable a move timer, adds a dropdown box when enabled (consider just disabling the combobox instead)
-	JComboBox<String> difficultySelect, moveTimerSelect; // select computer difficulty and timer length via dropdowns
+	private JCheckBox moveTimerEnabler; // checkbox to enable a move timer, adds a dropdown box when enabled (consider just disabling the combobox instead)
+	private JComboBox<String> difficultySelect, moveTimerSelect; // select computer difficulty and timer length via dropdowns
 	private JLabel[] labels; // label what the boxes and settings do
 	private JPanel[] fakeGrid; // gridlayout is the ugliest thing in the world so we fake it till we make it
 	private JLabel title; // header at top
@@ -78,7 +78,15 @@ public class OptionsMenu extends JPanel implements ActionListener { // how do di
 	public void actionPerformed(ActionEvent event) {
 		Object e = event.getSource();
 		if (e.equals(moveTimerEnabler)) {
-			moveTimerSelect.setEnabled(moveTimerEnabler.isSelected()); // i hope isSelected does what i think it does
+			moveTimerSelect.setEnabled(moveTimerEnabler.isSelected()); // show extra move timer options if enabled only
 		}
 	} // end actionPerformed
+
+	public int getDifficulty() {
+		return difficultySelect.getSelectedIndex();
+	}
+
+	public int getTimer() {
+		return moveTimerEnabler.isSelected() ? Integer.parseInt(((String) moveTimerSelect.getSelectedItem()).substring(0, 2).trim()) + 1 : -1; // returns it in seconds by parsing menu item
+	}
 }
