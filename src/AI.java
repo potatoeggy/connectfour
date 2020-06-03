@@ -170,7 +170,7 @@ public class AI {
 					}
 
 					ans.add(max);
-					System.out.println(max + "!");
+					//System.out.println(max + "!");
 					//alpha = Math.max(alpha, max);
 
 				} else { //Player - find smallest value
@@ -182,13 +182,13 @@ public class AI {
 					}
 
 					ans.add(min);
-					System.out.println(min + "?");
+					//System.out.println(min + "?");
 					//beta = Math.min(beta, min);
 				}
 
 				//Alpha-Beta pruning
 				if (beta <= alpha) {
-					System.out.println("Pruned" + depth + " " + alpha + " " + beta);
+					//System.out.println("Pruned" + depth + " " + alpha + " " + beta);
 					break;
 				}
 
@@ -198,9 +198,9 @@ public class AI {
 			}
 
 		}
-		System.out.println(Arrays.toString(ans.toArray()) + " " + depth);
+		//System.out.println(Arrays.toString(ans.toArray()) + " " + depth);
 		//System.out.println(alpha + " " + beta);
-		AITest.printBoard(b); //debug
+		//AITest.printBoard(b); //debug
 		return ans;
 	}
 
@@ -221,7 +221,7 @@ public class AI {
 
 		bestIndex = 0;
 		bestScore = Integer.MAX_VALUE;
-		for (int i = 0, col = 0; i < bestRows.size(), col < board.W; i++, col++) { // iterate and find highest value
+		for (int i = 0, col = 0; i < bestRows.size() && col < board.W; i++, col++) { // iterate and find highest value
 			if (nextEmpty(board, col) == -1) {
 				i--;
 				continue;
