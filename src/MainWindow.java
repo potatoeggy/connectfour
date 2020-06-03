@@ -156,11 +156,13 @@ public class MainWindow extends JFrame implements ActionListener {
 					win.gameWindow.toggleLock(); // disable lock
 					win.gameWindow.toggleAllButtons();
 					win.gameWindow.sendClick(col); // send click
+					responseTimer = 0;
 				}
 				
 				if (currentPlayer != win.gameWindow.getCurrentPlayer() || win.internalTurnCount != win.gameWindow.getTurnCount()) { // players have switched, reset timer
 					currentPlayer = win.gameWindow.getCurrentPlayer();
 					win.moveTimerInternal = win.moveTimerFull;
+					responseTimer = 0;
 				}
 				if (responseTimer == 5) { // 0.2 s per tick seems nice
 					if (win.moveTimerFull > 0) { // only update timer if it is used
