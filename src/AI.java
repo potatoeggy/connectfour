@@ -29,6 +29,7 @@ class coordinate implements Comparable<coordinate> {
 public class AI {
 
 	static Board b = new Board();
+	static ArrayList<Integer> fullCol = new ArrayList<>(); //keeps track of full columns
 
 	static int scoreGen(int[][] board) {
 		b.board = board;
@@ -38,9 +39,12 @@ public class AI {
 			for (int j = 0; j < b.W; j++) {
 				if (board[i][j] == 0) continue; //if position empty - continue
 				if (b.checkWin(i, j, 1)) { //if this is a winning move
+					System.out.println("AI WIN");
 					return Integer.MAX_VALUE; //if AI wins
-				} else if (b.checkWin(i, j, 2))
+				} else if (b.checkWin(i, j, 2)) {
+					System.out.println("PLAYER WIN");
 					return Integer.MIN_VALUE; //if player wins
+				}
 			}
 		}
 
@@ -141,17 +145,21 @@ public class AI {
 
 	static ArrayList<Integer> minMax(Board board, int depth, int player, int alpha, int beta) {
 		ArrayList<Integer> ans = new ArrayList<>(); //best answer for current player
-
 		for (int i = 0; i < board.W; i++) {
+
+			if (fullCol.contains(i)) continue; //if column is already full
+
 			Board b = new Board(); //copy of board
-			ArrayList<Integer> value = new ArrayList<Integer>(); //value of each move
+			ArrayList<Integer> value = new ArrayList<>(); //value of each move
 
 			b.board = new int[b.H][b.W];
 			for (int j = 0; j < b.H; j++) b.board[j] = Arrays.copyOf(board.board[j], b.W);
 
 			int x = nextEmpty(b, i); //next empty spot in column i
-
-			if (x == -1) continue; //if out of empty spaces continue
+			if (x == -1) {//if column full continue
+				fullCol.add(i);
+				continue;
+			}
 
 			b.board[x][i] = player; //try the position
 
@@ -179,15 +187,15 @@ public class AI {
 					ans.add(min);
 					alpha = Math.max(alpha, min);
 				}
-        
+
 				//Alpha-Beta pruning
 				if (beta <= alpha) break;
-			 //generate score for moves
+
+			} else { //generate score for moves
 				ans.add(scoreGen(b.board));
 				//System.out.println(ans.get(i)); //debug
-      
-			//AITest.printBoard(b); //debug
 			}
+			AITest.printBoard(b); //debug
 
 		}
 		return ans;
@@ -196,7 +204,7 @@ public class AI {
 	// utility function maintained by potatoeggy to act as a stable interface between Ai and gui
 	static int bestColumn(Board board, int difficulty) {
 		int bestIndex, bestScore;
-		int depth = 0;
+		int depth;
 		if (difficulty == 0) {
 			return (int) (Math.random() * 7); // it's incredibly easy
 		} else if (difficulty == 1) { // modify depth based on current difficulty

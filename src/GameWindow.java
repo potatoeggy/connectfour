@@ -2,22 +2,13 @@
 // 28 May 2020
 // The bulk of the annoying stuff to do
 
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.Font;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
-import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 public class GameWindow extends JPanel implements ActionListener {
 	private final JPanel header;
@@ -149,19 +140,19 @@ public class GameWindow extends JPanel implements ActionListener {
 			} else if (buttonsFilled >= 42) { // it's a tie
 				endGame(0);
 			} else {
-				currentPlayer *= -1; // switch player
+				currentPlayer = ((currentPlayer - 1) ^ 1) + 1; // switch player
 				gameStatus.setBackground(currentPlayer == 1 ? Color.RED : Color.YELLOW); // give visual indication of turn
 				if (players[currentPlayer == 1 ? 0 : 1] == 1) {
 					gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + " is thinking..."); // users don't like not knowing what's happening
 					headerButtons[0].setEnabled(false);
-					buttonGrid[0][AI.bestColumn(board, cpuDifficulty, currentPlayer)].doClick();
+					buttonGrid[0][AI.bestColumn(board, cpuDifficulty)].doClick();
 					headerButtons[0].setEnabled(true);
 				} else {
 					gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + "'s turn"); // update header
 				}
 			}
 		} else if (players[currentPlayer == 1 ? 0 : 1] == 1) {
-			buttonGrid[0][AI.bestColumn(board, cpuDifficulty, currentPlayer)].doClick();
+			buttonGrid[0][AI.bestColumn(board, cpuDifficulty)].doClick();
 		}
 	}
 
@@ -170,13 +161,13 @@ public class GameWindow extends JPanel implements ActionListener {
 	public void cpuInit() { // if the computer starts the game
 		gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + " is thinking..."); // users don't like not knowing what's happening
 		headerButtons[0].setEnabled(false);
-		buttonGrid[0][AI.bestColumn(board, cpuDifficulty, currentPlayer)].doClick();
+		buttonGrid[0][AI.bestColumn(board, cpuDifficulty)].doClick();
 		headerButtons[0].setEnabled(true);
 	}
 
 	public void endGame(int winningPlayer) { // handles game ending procedures
-		for (int i = 0; i < buttonGrid.length; i++) {
-			for (JButton butt : buttonGrid[i]) { // "disable" all grid buttons
+		for (JButton[] jButtons : buttonGrid) {
+			for (JButton butt : jButtons) { // "disable" all grid buttons
 				if (!legacyGraphics) butt.setContentAreaFilled(false);
 				butt.setRolloverEnabled(false);
 				butt.removeActionListener(this);
