@@ -107,7 +107,7 @@ public class GameWindow extends JPanel implements ActionListener {
 				buttonGrid[i][j].addMouseListener(new MouseAdapter() {
 					public void mouseEntered(MouseEvent event) { // highlight column when mouse goes over things
 						int y = (Integer) (((JButton) event.getSource()).getClientProperty("column"));
-						if (!gameOver && players[currentPlayer == 1 ? 1 : 0] == 0) buttonGrid[0][y].setIcon(arrow);
+						if (!gameOver && players[currentPlayer == 1 ? 1 : 0] == 1) buttonGrid[0][y].setIcon(arrow);
 					}
 
 					public void mouseExited(MouseEvent event) { // get rid of highlight when mouse leaves
