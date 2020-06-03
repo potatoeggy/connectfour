@@ -249,6 +249,6 @@ public class AI {
 
 	static void reset() { // screw static variables
 		b = new Board();
-		fullCol = new ArrayList<Integer>();
+		//fullCol = new ArrayList<Integer>();
 	}
 }
