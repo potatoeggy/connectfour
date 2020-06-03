@@ -9,6 +9,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 
 public class GameWindow extends JPanel implements ActionListener {
 	private final JPanel header;
@@ -251,5 +254,24 @@ public class GameWindow extends JPanel implements ActionListener {
 	public void toggleLock() {
 		this.actionLock = !this.actionLock;
 		this.headerButtons[0].setEnabled(!this.actionLock);
+	}
+
+	public void retrieveSave() throws FileNotFoundException {
+		File file = new File("savedGame.txt");
+		Scanner input = new Scanner(file);
+		for (int i = 0; i < board.H; i++) {
+			for (int j = 0; j < board.W; j++) {
+				board.board[i][j] = input.nextInt();
+			}
+			input.nextLine();
+		}
+		currentPlayer = input.nextInt();
+		cpuDifficulty = input.nextInt();
+		players = new int[]{input.nextInt(), input.nextInt()};
+		input.nextLine();
+		names = new String[]{input.next(), input.next()};
+		internalTurnCount = input.nextInt();
+		buttonsFilled = input.nextInt();
+		actionLock = input.nextBoolean();
 	}
 }
