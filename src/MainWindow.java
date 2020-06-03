@@ -147,19 +147,33 @@ public class MainWindow extends JFrame implements ActionListener {
 
 		while (win.isVisible()) { // exit when window is closed
 			int currentPlayer = win.gameWindow.getCurrentPlayer();
+			int responseTimer = 0;
 			Thread.sleep(1); // really stupid workaround because for whatever reason we don't enter the next loop sometimes
-			while (win.gameWindow.isVisible() && win.moveTimerFull > 0 && !win.gameWindow.isGameOver()) { // do not run timer when game is not ongoing
+			while (win.gameWindow.isVisible() && !win.gameWindow.isGameOver()) { // do not run timer when game is not ongoing
+				if (win.gameWindow.getLock()) { // if event thread is waiting for ai calculation
+					int col = AI.bestColumn(win.gameWindow.getBoard(), win.gameWindow.getDifficulty()); // calculate in different thread so we don't hang the main event thread
+					win.gameWindow.toggleLock(); // disable lock
+					win.gameWindow.toggleAllButtons();
+					win.gameWindow.sendClick(col); // send click
+				}
+				
 				if (currentPlayer != win.gameWindow.getCurrentPlayer() || win.internalTurnCount != win.gameWindow.getTurnCount()) { // players have switched, reset timer
 					currentPlayer = win.gameWindow.getCurrentPlayer();
 					win.moveTimerInternal = win.moveTimerFull;
 				}
-				win.moveTimerInternal--;
-				if (win.moveTimerInternal == 0) { // when time runs out
-					win.gameWindow.endGame(-1 * win.gameWindow.getCurrentPlayer()); // opposite player wins
+				if (responseTimer == 5) { // 0.2 s per tick seems nice
+					if (win.moveTimerFull > 0) { // only update timer if it is used
+						win.moveTimerInternal--;
+						if (win.moveTimerInternal == 0) { // when time runs out
+							win.gameWindow.endGame(-1 * win.gameWindow.getCurrentPlayer()); // opposite player wins
+						}
+						win.gameWindow.setTimer(win.moveTimerInternal); // update label in window
+					}
+					responseTimer = 0;
 				}
-				win.gameWindow.setTimer(win.moveTimerInternal); // update label in window
 				win.internalTurnCount = win.gameWindow.getTurnCount();
-				Thread.sleep(1000);
+				Thread.sleep(200);
+				responseTimer++;
 			}
 			if (win.gameWindow.isGameOver()) {
 				win.moveTimerInternal = win.moveTimerFull;
