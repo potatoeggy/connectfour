@@ -4,29 +4,24 @@
 
 // TODO: consider javadoc since maybe that'll give more marks
 
-import java.awt.Color;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.UIManager;
-
 public class MainWindow extends JFrame implements ActionListener {
 	// grab all the panels
-	private NewGameMenu newGameMenu;
-	private MainMenu mainMenu;
-	private OptionsMenu optionsMenu;
+	private final NewGameMenu newGameMenu;
+	private final MainMenu mainMenu;
+	private final OptionsMenu optionsMenu;
 	private GameWindow gameWindow;
 	private boolean optionsToNew; // where to go because the options menu should be accessible from in game and game creation menu
-	
+
 	// internal game variables
-	private Board board;
+	private final Board board;
 	private int[] players; // list of player types
 	private String[] names; // list of player names
-	private int currentPlayer; // corresponds to array index
+	private final int currentPlayer; // corresponds to array index
 	private int cpuDifficulty; // 0-3 to pass to AI
 	private int moveTimerInternal; // how much time is left (if negative, infinite) (might be handled by main come to think of it because we need threading)
 	private int moveTimerFull; // what to reset timer to

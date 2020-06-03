@@ -5,10 +5,9 @@ class AITest {
 	public static void main(String[] args) {
 		Board board = new Board();
 		int[][] b = new int[board.H][board.W];
-		b[5][0] = b[3][0] = 1;
-		b[4][0] = 2;
+		b[5][6] = b[4][6] = b[3][6] = 2;
 		board.board = b;
-		System.out.println(AI.scoreGen(b));
+		System.out.println(AI.minMax(board, 3, 1, Integer.MIN_VALUE, Integer.MAX_VALUE));
 		/*b[5][2] = b[4][3] = b[5][4] = b[4][4] = b[4][6] = 2;
 		b[5][3] = b[5][5] = b[5][6] = 1;
 		board.board = b;
