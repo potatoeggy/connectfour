@@ -38,9 +38,12 @@ public class AI {
 			for (int j = 0; j < b.W; j++) {
 				if (board[i][j] == 0) continue; //if position empty - continue
 				if (b.checkWin(i, j, 1)) { //if this is a winning move
-					return Integer.MAX_VALUE; //if AI wins
-				} else if (b.checkWin(i, j, 2))
-					return Integer.MIN_VALUE; //if player wins
+					//System.out.println("AI WIN");
+					return Integer.MAX_VALUE - 1; //if AI wins
+				} else if (b.checkWin(i, j, 2)) {
+					//System.out.println("PLAYER WIN");
+					return Integer.MIN_VALUE + 1; //if player wins
+				}
 			}
 		}
 
@@ -141,8 +144,8 @@ public class AI {
 
 	static ArrayList<Integer> minMax(Board board, int depth, int player, int alpha, int beta) {
 		ArrayList<Integer> ans = new ArrayList<>(); //best answer for current player
-
 		for (int i = 0; i < board.W; i++) {
+
 			Board b = new Board(); //copy of board
 			ArrayList<Integer> value = new ArrayList<>(); //value of each move
 
@@ -150,8 +153,9 @@ public class AI {
 			for (int j = 0; j < b.H; j++) b.board[j] = Arrays.copyOf(board.board[j], b.W);
 
 			int x = nextEmpty(b, i); //next empty spot in column i
-
-			if (x == -1) continue; //if out of empty spaces continue
+			if (x == -1) {//if column full continue
+				continue;
+			}
 
 			b.board[x][i] = player; //try the position
 
@@ -164,9 +168,10 @@ public class AI {
 					for (int j : value) {
 						max = Math.max(max, j);
 					}
-          
+
 					ans.add(max);
-					beta = Math.min(beta, max);
+					//System.out.println(max + "!");
+					//alpha = Math.max(alpha, max);
 
 				} else { //Player - find smallest value
 					value.addAll(minMax(b, depth - 1, 2, alpha, beta));
@@ -177,25 +182,32 @@ public class AI {
 					}
 
 					ans.add(min);
-					alpha = Math.max(alpha, min);
+					//System.out.println(min + "?");
+					//beta = Math.min(beta, min);
 				}
-        
+
 				//Alpha-Beta pruning
-				if (beta <= alpha) break;
-			 //generate score for moves
+				if (beta <= alpha) {
+					//System.out.println("Pruned" + depth + " " + alpha + " " + beta);
+					break;
+				}
+
+			} else { //generate score for moves
 				ans.add(scoreGen(b.board));
-				//System.out.println(ans.get(i)); //debug
-      
-			//AITest.printBoard(b); //debug
+				//System.out.println(ans.get(ans.size()-1)); //debug
+			}
 
 		}
+		//System.out.println(Arrays.toString(ans.toArray()) + " " + depth);
+		//System.out.println(alpha + " " + beta);
+		//AITest.printBoard(b); //debug
 		return ans;
 	}
 
 	// utility function maintained by potatoeggy to act as a stable interface between Ai and gui
 	static int bestColumn(Board board, int difficulty) {
 		int bestIndex, bestScore;
-		int depth = 0;
+		int depth;
 		if (difficulty == 0) {
 			return (int) (Math.random() * 7); // it's incredibly easy
 		} else if (difficulty == 1) { // modify depth based on current difficulty
@@ -203,12 +215,13 @@ public class AI {
 		} else if (difficulty == 2) {
 			depth = 4;
 		} else {
-			depth = 5; // do NOT use until ai is more optimised
+			depth = 8;
 		}
 		ArrayList<Integer> bestRows = minMax(board, depth, 1, Integer.MIN_VALUE, Integer.MAX_VALUE); // grab value from big algorithm
+
 		bestIndex = 0;
-		bestScore = Integer.MAX_VALUE;
-		for (int i = 0, col = 0; i < bestRows.size(), col < board.W; i++, col++) { // iterate and find highest value
+		bestScore = bestRows.get(0);
+		for (int i = 0, col = 0; i < bestRows.size() && i < board.W; i++, col++) { // iterate and find highest value
 			if (nextEmpty(board, col) == -1) {
 				i--;
 				continue;
@@ -218,6 +231,7 @@ public class AI {
 				bestIndex = col;
 			}
 		}
+		if (bestIndex == -1) System.out.println(Arrays.toString(bestRows.toArray()));
 		return bestIndex; // return to gui
 	}
 
@@ -231,5 +245,10 @@ public class AI {
 
 	static boolean startBlocked(int x, int y, int xM, int yM) {
 		return x - xM >= 0 && x - xM < b.H && y - yM >= 0 && y - yM < b.W && b.board[x - xM][y - yM] == 0;
+	}
+
+	static void reset() { // screw static variables
+		b = new Board();
+		//fullCol = new ArrayList<Integer>();
 	}
 }

@@ -87,6 +87,6 @@ public class OptionsMenu extends JPanel implements ActionListener { // how do di
 	}
 
 	public int getTimer() {
-		return moveTimerEnabler.isSelected() ? Integer.parseInt(((String) moveTimerSelect.getSelectedItem()).substring(0, 2).trim()) + 1 : -1; // returns it in seconds by parsing menu item
+		return moveTimerEnabler.isSelected() ? Integer.parseInt(((String) moveTimerSelect.getSelectedItem()).substring(0, 2).trim()) + 1: -1; // returns it in seconds by parsing menu item
 	}
 }

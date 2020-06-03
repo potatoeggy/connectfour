@@ -37,7 +37,9 @@ public class GameWindow extends JPanel implements ActionListener {
 	private int currentPlayer, cpuDifficulty;
 	private int[] players; // actually it means player *types*
 	private String[] names;
+	private int internalTurnCount;
 	private int buttonsFilled; // when at top the game is a tie
+	private boolean actionLock; // make things feel more responsive
 
 	public GameWindow(ActionListener eventHandler) {
 		legacyGraphics = false;
@@ -47,7 +49,9 @@ public class GameWindow extends JPanel implements ActionListener {
 		cpuDifficulty = 0;
 		players = new int[2];
 		names = new String[] {"Player 1", "Player 2"};
+		internalTurnCount = 0;
 		buttonsFilled = 0;
+		actionLock = false;
 
 		header = new JPanel();
 		headerJustification = new JPanel[]{new JPanel(), new JPanel(), new JPanel()};
@@ -103,7 +107,7 @@ public class GameWindow extends JPanel implements ActionListener {
 				buttonGrid[i][j].addMouseListener(new MouseAdapter() {
 					public void mouseEntered(MouseEvent event) { // highlight column when mouse goes over things
 						int y = (Integer) (((JButton) event.getSource()).getClientProperty("column"));
-						if (!gameOver) buttonGrid[0][y].setIcon(arrow);
+						if (!gameOver && players[currentPlayer == 1 ? 1 : 0] == 1) buttonGrid[0][y].setIcon(arrow);
 					}
 
 					public void mouseExited(MouseEvent event) { // get rid of highlight when mouse leaves
@@ -130,37 +134,66 @@ public class GameWindow extends JPanel implements ActionListener {
 	}
 
 	public void actionPerformed(ActionEvent event) {
+		if (actionLock) return;
 		int column = (Integer) (((JButton) event.getSource()).getClientProperty("column"));
 		int row = board.addChip(column, currentPlayer); // at least try to add chips
 		if (row != -1) {
 			buttonGrid[row+1][column].setBackground(currentPlayer == 1 ? Color.RED : Color.YELLOW); // unfortunately used to determine if something is occupying the square
 			buttonGrid[row+1][column].setText(null); // centre icon
 			buttonGrid[row+1][column].setIcon(currentPlayer == 1 ? redPiece : yellowPiece); // give player a pretty piece
-			buttonGrid[row+1][column].setRolloverEnabled(false); // "disable" button because setEnabled is garbage and makes everything gray
-			if (!legacyGraphics) buttonGrid[row+1][column].setContentAreaFilled(false);
-			buttonGrid[row+1][column].removeActionListener(this);
+			toggleButton(buttonGrid[row+1][column]);
+			buttonGrid[row+1][column].setContentAreaFilled(false); // "disable" button
 			buttonsFilled++;
 
+			internalTurnCount++;
 			if (board.checkWin(row, column, currentPlayer)) { // check if a player wins
 				endGame(currentPlayer);
 			} else if (buttonsFilled >= 42) { // it's a tie
 				endGame(0);
 			} else {
-				currentPlayer *= -1; // switch player
-				gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + "'s turn"); // update header
+				currentPlayer = ((currentPlayer - 1) ^ 1) + 1; // switch player
 				gameStatus.setBackground(currentPlayer == 1 ? Color.RED : Color.YELLOW); // give visual indication of turn
+				if (players[currentPlayer == 1 ? 0 : 1] == 1) { // if player is a computer
+					gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + " is thinking..."); // users don't like not knowing what's happening
+					toggleAllButtons();
+					toggleLock();
+				} else {
+					gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + "'s turn"); // update header
+				}
+			}
+		} else if (players[currentPlayer == 1 ? 0 : 1] == 1) { // we should only hit here if recalculating for random or if ai is broken
+			// recalculate
+			toggleAllButtons();
+			toggleLock();
+		}
+	}
+
+	public void toggleAllButtons() {
+		for (JButton[] array : buttonGrid) {
+			for (JButton butt : array) {
+				toggleButton(butt);
 			}
 		}
 	}
 
-	public void endGame(int winningPlayer) { // handles game ending procedures
-		for (int i = 0; i < buttonGrid.length; i++) {
-			for (JButton butt : buttonGrid[i]) { // "disable" all grid buttons
-				if (!legacyGraphics) butt.setContentAreaFilled(false);
-				butt.setRolloverEnabled(false);
-				butt.removeActionListener(this);
-			}
+	public void toggleButton(JButton butt) {
+		butt.setRolloverEnabled(!butt.isRolloverEnabled());
+		if (butt.getActionListeners().length != 0) {
+			butt.removeActionListener(this);
+		} else {
+			butt.addActionListener(this);
 		}
+		if (!legacyGraphics) butt.setContentAreaFilled(butt.isContentAreaFilled());
+	}
+
+	public void cpuInit() { // if the computer starts the game
+		gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + " is thinking..."); // users don't like not knowing what's happening
+		toggleAllButtons();
+		toggleLock();
+	}
+
+	public void endGame(int winningPlayer) { // handles game ending procedures
+		toggleAllButtons();
 		headerButtons[0].setText("Quit"); // do not save when game is over
 		if (winningPlayer == 0) {
 			gameStatus.setText("It's a draw!");
@@ -206,5 +239,26 @@ public class GameWindow extends JPanel implements ActionListener {
 
 	public int getCurrentPlayer() {
 		return this.currentPlayer;
+	}
+
+	public int getTurnCount() {
+		return this.internalTurnCount;
+	}
+
+	public int getDifficulty() {
+		return this.cpuDifficulty;
+	}
+
+	public boolean getLock() {
+		return this.actionLock;
+	}
+
+	public void sendClick(int col) {
+		buttonGrid[0][col].doClick();
+	}
+
+	public void toggleLock() {
+		this.actionLock = !this.actionLock;
+		this.headerButtons[0].setEnabled(!this.actionLock);
 	}
 }
