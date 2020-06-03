@@ -30,7 +30,9 @@ public class MainWindow extends JFrame implements ActionListener {
 	private int moveTimerFull; // what to reset timer to
 	private int internalTurnCount; // not shown to user, used to enforce move timer
 
-
+	/**
+	 * Creates the master object to handle all other objects.
+	 */
 	public MainWindow() {
 		// initialising internal variables
 		cpuDifficulty = 1;
@@ -69,6 +71,10 @@ public class MainWindow extends JFrame implements ActionListener {
 		pack();
 	}
 
+	/**
+	 * The global event handler for all objects.
+	 * All ActionEvents that would affect other panels should be directed here.
+	 */
 	public void actionPerformed(ActionEvent event) { // global event handler (mostly used for panel transition)
 		Object e = event.getSource();
 
