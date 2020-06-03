@@ -194,7 +194,7 @@ public class AI {
 	}
 
 	// utility function maintained by potatoeggy to act as a stable interface between Ai and gui
-	static int bestColumn(Board board, int difficulty, int player) {
+	static int bestColumn(Board board, int difficulty) {
 		int bestIndex, bestScore;
 		int depth = 0;
 		if (difficulty == 0) {
@@ -206,7 +206,7 @@ public class AI {
 		} else {
 			depth = 5; // do NOT use until ai is more optimised
 		}
-		ArrayList<Integer> bestRows = minMax(board, depth, player, Integer.MIN_VALUE, Integer.MAX_VALUE); // grab value from big algorithm
+		ArrayList<Integer> bestRows = minMax(board, depth, 1, Integer.MIN_VALUE, Integer.MAX_VALUE); // grab value from big algorithm
 		bestIndex = 0;
 		bestScore = bestRows.get(0);
 		for (int i = 1; i < bestRows.size() && i < board.W; i++) { // iterate and find highest value
