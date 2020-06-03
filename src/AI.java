@@ -218,10 +218,11 @@ public class AI {
 			depth = 5; // do NOT use until ai is more optimised
 		}
 		ArrayList<Integer> bestRows = minMax(board, depth, 1, Integer.MIN_VALUE, Integer.MAX_VALUE); // grab value from big algorithm
-		bestIndex = -1;
-		bestScore = Integer.MIN_VALUE;
-		for (int i = 0, col = 0; i < bestRows.size() && i < board.W && col < board.W; i++, col++) { // iterate and find highest value
-			if (nextEmpty(board, col) == -1) { //if this column is full
+
+		bestIndex = 0;
+		bestScore = Integer.MAX_VALUE;
+		for (int i = 0, col = 0; i < bestRows.size(), col < board.W; i++, col++) { // iterate and find highest value
+			if (nextEmpty(board, col) == -1) {
 				i--;
 				continue;
 			}
