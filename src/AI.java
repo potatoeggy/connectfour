@@ -220,7 +220,7 @@ public class AI {
 		ArrayList<Integer> bestRows = minMax(board, depth, 1, Integer.MIN_VALUE, Integer.MAX_VALUE); // grab value from big algorithm
 
 		bestIndex = 0;
-		bestScore = Integer.MAX_VALUE;
+		bestScore = bestRows.get(0);
 		for (int i = 0, col = 0; i < bestRows.size() && i < board.W; i++, col++) { // iterate and find highest value
 			if (nextEmpty(board, col) == -1) {
 				i--;
