@@ -215,7 +215,7 @@ public class AI {
 		} else if (difficulty == 2) {
 			depth = 4;
 		} else {
-			depth = 5; // do NOT use until ai is more optimised
+			depth = 8;
 		}
 		ArrayList<Integer> bestRows = minMax(board, depth, 1, Integer.MIN_VALUE, Integer.MAX_VALUE); // grab value from big algorithm
 
@@ -245,5 +245,10 @@ public class AI {
 
 	static boolean startBlocked(int x, int y, int xM, int yM) {
 		return x - xM >= 0 && x - xM < b.H && y - yM >= 0 && y - yM < b.W && b.board[x - xM][y - yM] == 0;
+	}
+
+	static void reset() { // screw static variables
+		b = new Board();
+		fullCol = new ArrayList<Integer>();
 	}
 }

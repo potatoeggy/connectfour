@@ -39,6 +39,7 @@ public class GameWindow extends JPanel implements ActionListener {
 	private String[] names;
 	private int internalTurnCount;
 	private int buttonsFilled; // when at top the game is a tie
+	private boolean actionLock; // make things feel more responsive
 
 	public GameWindow(ActionListener eventHandler) {
 		legacyGraphics = false;
@@ -50,6 +51,7 @@ public class GameWindow extends JPanel implements ActionListener {
 		names = new String[] {"Player 1", "Player 2"};
 		internalTurnCount = 0;
 		buttonsFilled = 0;
+		actionLock = false;
 
 		header = new JPanel();
 		headerJustification = new JPanel[]{new JPanel(), new JPanel(), new JPanel()};
@@ -132,15 +134,15 @@ public class GameWindow extends JPanel implements ActionListener {
 	}
 
 	public void actionPerformed(ActionEvent event) {
+		if (actionLock) return;
 		int column = (Integer) (((JButton) event.getSource()).getClientProperty("column"));
 		int row = board.addChip(column, currentPlayer); // at least try to add chips
 		if (row != -1) {
 			buttonGrid[row+1][column].setBackground(currentPlayer == 1 ? Color.RED : Color.YELLOW); // unfortunately used to determine if something is occupying the square
 			buttonGrid[row+1][column].setText(null); // centre icon
 			buttonGrid[row+1][column].setIcon(currentPlayer == 1 ? redPiece : yellowPiece); // give player a pretty piece
-			buttonGrid[row+1][column].setRolloverEnabled(false); // "disable" button because setEnabled is garbage and makes everything gray
-			if (!legacyGraphics) buttonGrid[row+1][column].setContentAreaFilled(false);
-			buttonGrid[row+1][column].removeActionListener(this);
+			toggleButton(buttonGrid[row+1][column]);
+			buttonGrid[row+1][column].setContentAreaFilled(false); // "disable" button
 			buttonsFilled++;
 
 			internalTurnCount++;
@@ -151,37 +153,47 @@ public class GameWindow extends JPanel implements ActionListener {
 			} else {
 				currentPlayer = ((currentPlayer - 1) ^ 1) + 1; // switch player
 				gameStatus.setBackground(currentPlayer == 1 ? Color.RED : Color.YELLOW); // give visual indication of turn
-				if (players[currentPlayer == 1 ? 0 : 1] == 1) {
+				if (players[currentPlayer == 1 ? 0 : 1] == 1) { // if player is a computer
 					gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + " is thinking..."); // users don't like not knowing what's happening
-					headerButtons[0].setEnabled(false);
-					buttonGrid[0][AI.bestColumn(board, cpuDifficulty)].doClick();
-					headerButtons[0].setEnabled(true);
+					toggleAllButtons();
+					toggleLock();
 				} else {
 					gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + "'s turn"); // update header
 				}
 			}
-		} else if (players[currentPlayer == 1 ? 0 : 1] == 1) {
-			buttonGrid[0][AI.bestColumn(board, cpuDifficulty)].doClick();
+		} else if (players[currentPlayer == 1 ? 0 : 1] == 1) { // we should only hit here if recalculating for random or if ai is broken
+			// recalculate
+			toggleAllButtons();
+			toggleLock();
 		}
 	}
 
-	// TODO: disable human clicking while it's the computers turn (or maybe the event lock solves that)
+	public void toggleAllButtons() {
+		for (JButton[] array : buttonGrid) {
+			for (JButton butt : array) {
+				toggleButton(butt);
+			}
+		}
+	}
+
+	public void toggleButton(JButton butt) {
+		butt.setRolloverEnabled(!butt.isRolloverEnabled());
+		if (butt.getActionListeners().length != 0) {
+			butt.removeActionListener(this);
+		} else {
+			butt.addActionListener(this);
+		}
+		if (!legacyGraphics) butt.setContentAreaFilled(butt.isContentAreaFilled());
+	}
 
 	public void cpuInit() { // if the computer starts the game
 		gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + " is thinking..."); // users don't like not knowing what's happening
-		headerButtons[0].setEnabled(false);
-		buttonGrid[0][AI.bestColumn(board, cpuDifficulty)].doClick();
-		headerButtons[0].setEnabled(true);
+		toggleAllButtons();
+		toggleLock();
 	}
 
 	public void endGame(int winningPlayer) { // handles game ending procedures
-		for (JButton[] jButtons : buttonGrid) {
-			for (JButton butt : jButtons) { // "disable" all grid buttons
-				if (!legacyGraphics) butt.setContentAreaFilled(false);
-				butt.setRolloverEnabled(false);
-				butt.removeActionListener(this);
-			}
-		}
+		toggleAllButtons();
 		headerButtons[0].setText("Quit"); // do not save when game is over
 		if (winningPlayer == 0) {
 			gameStatus.setText("It's a draw!");
@@ -231,5 +243,22 @@ public class GameWindow extends JPanel implements ActionListener {
 
 	public int getTurnCount() {
 		return this.internalTurnCount;
+	}
+
+	public int getDifficulty() {
+		return this.cpuDifficulty;
+	}
+
+	public boolean getLock() {
+		return this.actionLock;
+	}
+
+	public void sendClick(int col) {
+		buttonGrid[0][col].doClick();
+	}
+
+	public void toggleLock() {
+		this.actionLock = !this.actionLock;
+		this.headerButtons[0].setEnabled(!this.actionLock);
 	}
 }
