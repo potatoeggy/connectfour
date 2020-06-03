@@ -221,7 +221,7 @@ public class AI {
 
 		bestIndex = 0;
 		bestScore = Integer.MAX_VALUE;
-		for (int i = 0, col = 0; i < bestRows.size(), col < board.W; i++, col++) { // iterate and find highest value
+		for (int i = 0, col = 0; i < bestRows.size() && i < board.W; i++) { // iterate and find highest value
 			if (nextEmpty(board, col) == -1) {
 				i--;
 				continue;

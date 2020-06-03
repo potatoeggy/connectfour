@@ -4,10 +4,15 @@
 
 // TODO: consider javadoc since maybe that'll give more marks
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 public class MainWindow extends JFrame implements ActionListener {
 	// grab all the panels
@@ -18,10 +23,8 @@ public class MainWindow extends JFrame implements ActionListener {
 	private boolean optionsToNew; // where to go because the options menu should be accessible from in game and game creation menu
 
 	// internal game variables
-	private final Board board;
 	private int[] players; // list of player types
 	private String[] names; // list of player names
-	private final int currentPlayer; // corresponds to array index
 	private int cpuDifficulty; // 0-3 to pass to AI
 	private int moveTimerInternal; // how much time is left (if negative, infinite) (might be handled by main come to think of it because we need threading)
 	private int moveTimerFull; // what to reset timer to
@@ -30,7 +33,6 @@ public class MainWindow extends JFrame implements ActionListener {
 
 	public MainWindow() {
 		// initialising internal variables
-		currentPlayer = 1;
 		cpuDifficulty = 1;
 		moveTimerInternal = -1;
 		moveTimerFull = -1;
@@ -41,7 +43,6 @@ public class MainWindow extends JFrame implements ActionListener {
 		newGameMenu = new NewGameMenu(this);
 		mainMenu = new MainMenu(this);
 		optionsMenu = new OptionsMenu(this);
-		board = new Board();
 		gameWindow = new GameWindow(this);
 
 		for (JPanel pan : new JPanel[] {newGameMenu, mainMenu, optionsMenu, gameWindow}) {
