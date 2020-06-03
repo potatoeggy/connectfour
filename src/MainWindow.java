@@ -91,6 +91,7 @@ public class MainWindow extends JFrame implements ActionListener {
 			names = newGameMenu.getNames();
 			players = newGameMenu.getPlayers();
 			gameWindow = new GameWindow(this);
+			AI.reset(); // it's not an object so we have to call something
 
 			// pass information from new game and options, if configured
 			gameWindow.setNames(names);

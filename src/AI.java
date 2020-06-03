@@ -237,4 +237,9 @@ public class AI {
 	static boolean startBlocked(int x, int y, int xM, int yM) {
 		return x - xM >= 0 && x - xM < b.H && y - yM >= 0 && y - yM < b.W && b.board[x - xM][y - yM] == 0;
 	}
+
+	static void reset() { // screw static variables
+		b = new Board();
+		fullCol = new ArrayList<Integer>;
+	}
 }

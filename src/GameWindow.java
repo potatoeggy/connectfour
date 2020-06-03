@@ -174,7 +174,7 @@ public class GameWindow extends JPanel implements ActionListener {
 		} else {
 			butt.addActionListener(this);
 		}
-		if (!legacyGraphics) butt.setContentAreaFilled(butt.getBackground() == Color.WHITE);
+		if (!legacyGraphics) butt.setContentAreaFilled(butt.isContentAreaFilled());
 	}
 
 	public void cpuInit() { // if the computer starts the game
