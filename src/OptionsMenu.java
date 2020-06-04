@@ -100,6 +100,10 @@ public class OptionsMenu extends JPanel implements ActionListener { // how do di
 		return difficultySelect.getSelectedIndex();
 	}
 
+	public void setDifficulty(int index) {
+		difficultySelect.setSelectedIndex(index);
+	}
+
 	/**
 	 * Returns the current move timer length set in the options menu.
 	 * The user-selected item in the combo box is converted to an integer if the move timer is enabled.
@@ -107,5 +111,10 @@ public class OptionsMenu extends JPanel implements ActionListener { // how do di
 	 */
 	public int getTimer() {
 		return moveTimerEnabler.isSelected() ? Integer.parseInt(((String) moveTimerSelect.getSelectedItem()).substring(0, 2).trim()) + 1: -1; // returns it in seconds by parsing menu item
+	}
+
+	public void setTimer(boolean enabled, int seconds) {
+		moveTimerEnabler.setSelected(enabled);
+		moveTimerSelect.setSelectedItem(seconds + " seconds");
 	}
 }

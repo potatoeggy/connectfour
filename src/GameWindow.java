@@ -24,13 +24,12 @@ public class GameWindow extends JPanel implements ActionListener {
 	private boolean gameOver;
 
 	// internal game variables copied from MainWindow
-	protected Board board; // internal board
-	protected int currentPlayer, cpuDifficulty;
+	private Board board; // internal board
+	private String loadBoard; // internal board used for saving and loading 
+	private int currentPlayer;
 	private int[] players; // actually it means player *types*
 	private String[] names;
-	private int internalTurnCount;
-	protected int buttonsFilled; // when at top the game is a tie
-	protected boolean actionLock; // make things feel more responsive
+	private boolean actionLock; // make things feel more responsive
 
 	/**
 	 * Creates a new game panel, with options set by default to allow for simple gameplay out of the box.
@@ -41,12 +40,10 @@ public class GameWindow extends JPanel implements ActionListener {
 		legacyGraphics = false;
 		gameOver = false;
 		board = new Board();
+		loadBoard = "";
 		currentPlayer = 1;
-		cpuDifficulty = 0;
 		players = new int[2];
 		names = new String[] {"Player 1", "Player 2"};
-		internalTurnCount = 0;
-		buttonsFilled = 0;
 		actionLock = false;
 
 		header = new JPanel();
@@ -59,7 +56,7 @@ public class GameWindow extends JPanel implements ActionListener {
 		moveTimer = new JLabel();
 
 		gameStatus.setFont(new Font("sans-serif", Font.BOLD, 18)); // make it big and bold
-		gameStatus.setBackground(Color.RED); // TODO: remember to handle colour backgrounds when loading saves
+		gameStatus.setBackground(Color.RED);
 		gameStatus.setOpaque(true); // support filling in backgrounds
 
 		try { // try to load fancy pictures
@@ -136,6 +133,7 @@ public class GameWindow extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent event) {
 		if (actionLock) return;
 		int column = (Integer) (((JButton) event.getSource()).getClientProperty("column"));
+		loadBoard += column;
 		int row = board.addChip(column, currentPlayer); // at least try to add chips
 		if (row != -1) {
 			buttonGrid[row+1][column].setBackground(currentPlayer == 1 ? Color.RED : Color.YELLOW); // unfortunately used to determine if something is occupying the square
@@ -143,12 +141,10 @@ public class GameWindow extends JPanel implements ActionListener {
 			buttonGrid[row+1][column].setIcon(currentPlayer == 1 ? redPiece : yellowPiece); // give player a pretty piece
 			toggleButton(buttonGrid[row+1][column]);
 			buttonGrid[row+1][column].setContentAreaFilled(false); // "disable" button
-			buttonsFilled++;
 
-			internalTurnCount++;
 			if (board.checkWin(row, column, currentPlayer)) { // check if a player wins
 				endGame(currentPlayer);
-			} else if (buttonsFilled >= 42) { // it's a tie
+			} else if (loadBoard.length() >= 42) { // it's a tie
 				endGame(0);
 			} else {
 				currentPlayer = ((currentPlayer - 1) ^ 1) + 1; // switch player
@@ -233,15 +229,6 @@ public class GameWindow extends JPanel implements ActionListener {
 	}
 
 	/**
-	 * Sets the difficulty of the computer.
-	 * This value is passed to the AI to determine how strong its next move will be.
-	 * @param cpuDifficulty	An integer from 0 to 3 indicating difficulty in ascending order.
-	 */
-	public void setDifficulty(int cpuDifficulty) {
-		this.cpuDifficulty = cpuDifficulty;
-	}
-
-	/**
 	 * Sets the label to show remaining time for the current player in seconds.
 	 * This method does not check to see if the player has lost. If the timer value is invalid, the timer label is cleared.
 	 * @param moveTimerRemaining	The remaining time, in seconds, for the current player to move.
@@ -295,28 +282,19 @@ public class GameWindow extends JPanel implements ActionListener {
 	}
 
 	/**
+	 * Returns the order of moves that the game has been played through.
+	 * @return	A String of integers from 0 to 6, with each integer representing the column that polarity's player placed a piece in.
+	 */
+	public String getBoardHistory() {
+		return this.loadBoard;
+	}
+
+	/**
 	 * Returns an integer to denote the current player.
 	 * @return	1 or -1 to represent player 1 or player 2, respectively.
 	 */
 	public int getCurrentPlayer() {
 		return this.currentPlayer;
-	}
-
-	/**
-	 * Returns the number of turns that have passed since the start of the game.
-	 * Primarily used as a sort of server to ensure that any multithreaded processes are up to date.
-	 * @return	An integer representing the number of turns that both players have had since the start of the game.
-	 */
-	public int getTurnCount() {
-		return this.internalTurnCount;
-	}
-
-	/**
-	 * Returns the current computer difficulty set in the game.
-	 * @return	An integer from 0 to 3 showing the currently-set difficulty, increasing in ascending order.
-	 */
-	public int getDifficulty() {
-		return this.cpuDifficulty;
 	}
 
 	/**
@@ -344,5 +322,15 @@ public class GameWindow extends JPanel implements ActionListener {
 	public void toggleLock() {
 		this.actionLock = !this.actionLock;
 		this.headerButtons[0].setEnabled(!this.actionLock);
+	}
+
+	public void loadGame(String loadBoard, int[] players, String[] names, int currentPlayer) {
+		this.loadBoard = loadBoard;
+		this.names = names;
+		this.currentPlayer = currentPlayer;
+		for (int i = 0; i < loadBoard.length(); i++) {
+			sendClick((int) (loadBoard.charAt(i) - '0'));
+		}
+		this.players = players;
 	}
 }

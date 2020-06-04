@@ -21,6 +21,7 @@ public class MainMenu extends JPanel {
 	public MainMenu(ActionListener eventHandler) {
 		title = new JLabel("Connect 4");
 		buttons = new JButton[] {new JButton("New game"), new JButton("Load game"), new JButton("Exit")};
+		buttons[1].setEnabled(false);
 
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		add(title);
@@ -33,4 +34,12 @@ public class MainMenu extends JPanel {
 		}
 		setVisible(false); // invisible by default
 	} // end constructor
+
+	public void enableLoad() {
+		buttons[1].setEnabled(true);
+	}
+
+	public void disableLoad() {
+		buttons[1].setEnabled(false);
+	}
 }
