@@ -65,7 +65,7 @@ public class MainWindow extends JFrame implements ActionListener {
 	private void transition(JPanel toAdd) { // enables panels
 		// make things appear
 		if (toAdd.equals(mainMenu)) {
-			if (new File("saveGame.txt").exists()) {
+			if (new File("savedGame.txt").exists()) {
 				mainMenu.enableLoad();
 			} else {
 				mainMenu.disableLoad();
