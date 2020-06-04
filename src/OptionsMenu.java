@@ -20,6 +20,11 @@ public class OptionsMenu extends JPanel implements ActionListener { // how do di
 	private JLabel[] labels; // label what the boxes and settings do
 	private JPanel[] fakeGrid; // gridlayout is the ugliest thing in the world so we fake it till we make it
 	private JLabel title; // header at top
+
+	/**
+	 * Create a new panel containing various configuration options for Connect 4.
+	 * @param eventHandler	The event handler that all events that would cause the user to leave the page are passed to.
+	 */
 	public OptionsMenu(ActionListener eventHandler) {
 		fakeGrid = new JPanel[] {new JPanel(), new JPanel(), new JPanel(), new JPanel()}; // fake the grid
 		title = new JLabel("Options");
@@ -75,6 +80,10 @@ public class OptionsMenu extends JPanel implements ActionListener { // how do di
 		setVisible(false); // visibility should be handled by MainWindow
 	} // end constructor
 
+	/**
+	 * Handles events that originate and do not change anything outside of the panel.
+	 * This only consists of enabling and disabling the drop-down for move timer options when the checkbox is enabled or disabled.
+	 */
 	public void actionPerformed(ActionEvent event) {
 		Object e = event.getSource();
 		if (e.equals(moveTimerEnabler)) {
@@ -82,10 +91,20 @@ public class OptionsMenu extends JPanel implements ActionListener { // how do di
 		}
 	} // end actionPerformed
 
+	/**
+	 * Returns the current difficulty set in the options menu.
+	 * Ranges from 0 to 3 in ascending order of difficulty. Defaults to 1 if the user has not changed the difficulty.
+	 * @return	An integer from 0 to 3, indicating level of difficulty in ascending order.
+	 */
 	public int getDifficulty() {
 		return difficultySelect.getSelectedIndex();
 	}
 
+	/**
+	 * Returns the current move timer length set in the options menu.
+	 * The user-selected item in the combo box is converted to an integer if the move timer is enabled.
+	 * @return	The number of seconds that the move timer should reset to, or -1 if the timer is disabled.
+	 */
 	public int getTimer() {
 		return moveTimerEnabler.isSelected() ? Integer.parseInt(((String) moveTimerSelect.getSelectedItem()).substring(0, 2).trim()) + 1: -1; // returns it in seconds by parsing menu item
 	}

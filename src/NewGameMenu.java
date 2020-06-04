@@ -22,6 +22,10 @@ public class NewGameMenu extends JPanel {
 	private JTextField[] nameSelect; // select name
 	JButton[] buttons; // continue or quit
 
+	/**
+	 * Create a new panel with options for the user to create a new game of Connect 4.
+	 * @param eventHandler	An event handler that events that would cause the user to leave the panel will be passed to. 
+	 */
 	public NewGameMenu(ActionListener eventHandler) {
 		// create all objects for frame menu
 		playerBox = new JPanel();
@@ -60,10 +64,20 @@ public class NewGameMenu extends JPanel {
 		setVisible(false); // set invisible by default as visibility should be handed by main
 	}
 
+	/**
+	 * Get the current names of the players.
+	 * Players' names are entered in a JTextField on this panel.
+	 * @return A String array containing two elements, one for each player.
+	 */
 	public String[] getNames() {
 		return new String[] {nameSelect[0].getText(), nameSelect[1].getText()};
 	}
 
+	/**
+	 * Get the current category of players.
+	 * Players can be human- or computer-controlled. This is set by the user in a drop-down box.
+	 * @return An int array containing two elements, one for each player.
+	 */
 	public int[] getPlayers() {
 		return new int[] {playerSelect[0].getSelectedIndex(), playerSelect[1].getSelectedIndex()};
 	}
