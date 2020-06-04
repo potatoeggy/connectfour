@@ -115,6 +115,7 @@ public class OptionsMenu extends JPanel implements ActionListener { // how do di
 
 	public void setTimer(boolean enabled, int seconds) {
 		moveTimerEnabler.setSelected(enabled);
+		moveTimerSelect.setEnabled(enabled);
 		moveTimerSelect.setSelectedItem(seconds + " seconds");
 	}
 }
