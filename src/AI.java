@@ -211,11 +211,11 @@ public class AI {
 		if (difficulty == 0) {
 			return (int) (Math.random() * 7); // it's incredibly easy
 		} else if (difficulty == 1) { // modify depth based on current difficulty
-			depth = 3;
+			depth = 2;
 		} else if (difficulty == 2) {
-			depth = 4;
+			depth = 3;
 		} else {
-			depth = 8;
+			depth = 4;
 		}
 		ArrayList<Integer> bestRows = minMax(board, depth, 1, Integer.MIN_VALUE, Integer.MAX_VALUE); // grab value from big algorithm
 

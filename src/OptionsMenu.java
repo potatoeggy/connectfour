@@ -38,7 +38,7 @@ public class OptionsMenu extends JPanel implements ActionListener { // how do di
 			"Easy",
 			"Normal",
 			"Hard",
-			"Impossible"
+			"Very hard"
 		}) {
 			difficultySelect.addItem(s);
 		}
