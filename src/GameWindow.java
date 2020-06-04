@@ -333,12 +333,20 @@ public class GameWindow extends JPanel implements ActionListener {
 		this.headerButtons[0].setEnabled(!this.actionLock);
 	}
 
+	/**
+	 * Loads a game state.
+	 * The history of moves is played through and all internal variables are set.
+	 * @param loadBoard	A String consisting of only digits, with each number determining a player move in that column.
+	 * @param players	An integer array containing the type of player (<code>0</code> or <code>1</code>). If more than two elements are passed in the array, only the first two will be read.
+	 * @param names		A String array containing the names of the two players. If more than two elements are passed in the array, only the first two will be read.
+	 * @param currentPlayer	An integer denoting the turn player. (<code>1</code> for player 1, <code>2</code> for player 2.)
+	 */
 	public void loadGame(String loadBoard, int[] players, String[] names, int currentPlayer) {
 		this.loadBoard = loadBoard;
 		this.names = names;
 		this.currentPlayer = currentPlayer;
 		for (int i = 0; i < loadBoard.length(); i++) {
-			sendClick((int) (loadBoard.charAt(i) - '0'));
+			sendClick((int) (loadBoard.charAt(i) - '0')); // convert char holding number to int
 		}
 		this.players = players;
 	}

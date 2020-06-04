@@ -35,10 +35,16 @@ public class MainMenu extends JPanel {
 		setVisible(false); // invisible by default
 	} // end constructor
 
+	/**
+	 * Enables the "Load Game" button.
+	 */
 	public void enableLoad() {
 		buttons[1].setEnabled(true);
 	}
 
+	/**
+	 * Disables the "Load Game" button.
+	 */
 	public void disableLoad() {
 		buttons[1].setEnabled(false);
 	}

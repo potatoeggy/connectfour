@@ -197,47 +197,57 @@ public class MainWindow extends JFrame implements ActionListener {
 		}
 	}
 
+	/**
+	 * Saves the game to <code>savedGame.txt</code>.
+	 * If the file cannot be successfully written to, nothing will happen.
+	 * @return	A boolean denoting whether saving was successful.
+	 */
 	public boolean saveGame() {
 		try {
 			PrintWriter printWriter = new PrintWriter("savedGame.txt");
-			for (int i : players) printWriter.print(i + " ");
+			for (int i : players) printWriter.print(i + " "); // write player types
 			printWriter.println();
-			for (String string : names) printWriter.println(string);
-			//saves the board state
-			printWriter.println(gameWindow.getBoardHistory());
+			for (String string : names) printWriter.println(string); // write player names
+			printWriter.println(gameWindow.getBoardHistory()); // write board state
 			for (int i : new int[] {gameWindow.getCurrentPlayer(),
 									cpuDifficulty, moveTimerInternal, moveTimerFull}) {
-				printWriter.println(i);
+				printWriter.println(i); // write the rest of the internal variables
 			}
 			printWriter.close();
 		} catch (Exception e) {
 			System.err.println("Save failed.");
 			e.printStackTrace();
-			return false;
+			return false; // saving was unsuccessful
 		}
-		return true;
+		return true; // saving was successful
 	}
 
+	/**
+	 * Loads game data to MainWindow and GameWindow.
+	 * GameWindow's required data is pushed to it via its own load method. If the file cannot be successfully read, data up to the point of failure will be written internally.
+	 * @return	A boolean denoting whether loading was successful.
+	 */
 	public boolean retrieveSave() {
 		try {
 			Scanner input = new Scanner(new File("savedGame.txt"));
-			players = new int[]{input.nextInt(), input.nextInt()};
+			players = new int[]{input.nextInt(), input.nextInt()}; // read player types
 			input.nextLine();
-			names = new String[] {input.nextLine(), input.nextLine()};
-			gameWindow.loadGame(input.nextLine(), players, names, input.nextInt());
+			names = new String[] {input.nextLine(), input.nextLine()}; // read player names
+			gameWindow.loadGame(input.nextLine(), players, names, input.nextInt()); // read and send internal variables for GameWindow
 			cpuDifficulty = input.nextInt();
 			moveTimerInternal = input.nextInt();
 			moveTimerFull = input.nextInt();
 			internalTurnCount = gameWindow.getBoardHistory().length();
 			input.close();
 
+			// set gui status of options menu
 			optionsMenu.setDifficulty(cpuDifficulty);
 			optionsMenu.setTimer(moveTimerFull != -1, moveTimerFull-1);
 		} catch (Exception ex) {
 			System.err.println("Load failed.");
 			ex.printStackTrace();
-			return false;
+			return false; // load was unsuccessful
 		}
-		return true;
+		return true; // load was successful
 	}
 }
