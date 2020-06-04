@@ -41,6 +41,10 @@ public class GameWindow extends JPanel implements ActionListener {
 	private int buttonsFilled; // when at top the game is a tie
 	private boolean actionLock; // make things feel more responsive
 
+	/**
+	 * Creates a new game panel, with options set by default to allow for simple gameplay out of the box.
+	 * @param eventHandler	The event handler that all actions that involve other panels are passed to.
+	 */
 	public GameWindow(ActionListener eventHandler) {
 		legacyGraphics = false;
 		gameOver = false;
@@ -133,6 +137,10 @@ public class GameWindow extends JPanel implements ActionListener {
 		setVisible(false);
 	}
 
+	/**
+	 * The event handler for all in-game actions.
+	 * Includes managing button clickability, displaying of icons, and locking when playing against computers.
+	 */
 	public void actionPerformed(ActionEvent event) {
 		if (actionLock) return;
 		int column = (Integer) (((JButton) event.getSource()).getClientProperty("column"));
@@ -168,6 +176,10 @@ public class GameWindow extends JPanel implements ActionListener {
 		}
 	}
 
+	/**
+	 * A utility method to call <code>toggleButton</code> for every button on the screen.
+	 * @see	toggleButton
+	 */
 	public void toggleAllButtons() {
 		for (JButton[] array : buttonGrid) {
 			for (JButton butt : array) {
@@ -176,6 +188,11 @@ public class GameWindow extends JPanel implements ActionListener {
 		}
 	}
 
+	/**
+	 * Toggles the enabled/disabled state of the button, as well as removes/adds its ActionListener.
+	 * If legacy graphics are enabled, the clickability of the button does not change.
+	 * @param butt	The JButton to toggle the state of.
+	 */
 	public void toggleButton(JButton butt) {
 		butt.setRolloverEnabled(!butt.isRolloverEnabled());
 		if (butt.getActionListeners().length != 0) {
@@ -186,12 +203,22 @@ public class GameWindow extends JPanel implements ActionListener {
 		if (!legacyGraphics) butt.setContentAreaFilled(butt.isContentAreaFilled());
 	}
 
+	/**
+	 * Forces a move by the computer.
+	 * This is used when the computer goes first, as the general toggle for a computer move is in <code>actionPerformed</code>
+	 */
 	public void cpuInit() { // if the computer starts the game
 		gameStatus.setText((currentPlayer == 1 ? names[0] : names[1]) + " is thinking..."); // users don't like not knowing what's happening
 		toggleAllButtons();
 		toggleLock();
 	}
 
+	/**
+	 * Ends gameplay and informs players of the winner.
+	 * This method provides an indicator to disable saving, changes the status header to indicate the end-of-game state, and disables buttons. 
+	 * The <code>gameOver</code> flag is set to true to let other methods know that the game has ended.
+	 * @param winningPlayer	An integer to determine what text will be displayed in the header.
+	 */
 	public void endGame(int winningPlayer) { // handles game ending procedures
 		toggleAllButtons();
 		headerButtons[0].setText("Quit"); // do not save when game is over
@@ -204,14 +231,29 @@ public class GameWindow extends JPanel implements ActionListener {
 		gameOver = true;
 	}
 
+	/**
+	 * Returns whether the game is over.
+	 * @return	A boolean flag indicating whether the game has ended.
+	 * @see	endGame
+	 */
 	public boolean isGameOver() {
 		return this.gameOver;
 	}
 
+	/**
+	 * Sets the difficulty of the computer.
+	 * This value is passed to the AI to determine how strong its next move will be.
+	 * @param cpuDifficulty	An integer from 0 to 3 indicating difficulty in ascending order.
+	 */
 	public void setDifficulty(int cpuDifficulty) {
 		this.cpuDifficulty = cpuDifficulty;
 	}
 
+	/**
+	 * Sets the label to show remaining time for the current player in seconds.
+	 * This method does not check to see if the player has lost. If the timer value is invalid, the timer label is cleared.
+	 * @param moveTimerRemaining	The remaining time, in seconds, for the current player to move.
+	 */
 	public void setTimer(int moveTimerRemaining) {
 		if (moveTimerRemaining >= 0) { // sanity checking just in case things break in MainWindow (it shouldn't but you never know)
 			this.moveTimer.setText("Time: " + moveTimerRemaining);
@@ -220,43 +262,93 @@ public class GameWindow extends JPanel implements ActionListener {
 		}
 	}
 
+	/**
+	 * Sets the names shown in the status header.
+	 * If the String array passed contains more than two elements, only the first two will be used.
+	 * The status header will be updated immediately with the new name.
+	 * @param names	A String array containing the names to be displayed in the status header.
+	 */
 	public void setNames(String[] names) {
 		this.names = names;
-		if (currentPlayer == 1) this.gameStatus.setText(names[0] + "'s turn");
+		if (currentPlayer == 1) {
+			this.gameStatus.setText(names[0] + "'s turn");
+		} else {
+			this.gameStatus.setText(names[1] + "'s turn");
+		}
 	}
 
+	/**
+	 * Sets the current types of players in the game.
+	 * If the integer array passed contains more than two elements, only the first two will be used.
+	 * @param players	An int array containing the types (0 for human, 1 for computer) of players that are in the game. 
+	 */
 	public void setPlayers(int[] players) {
 		this.players = players;
 	}
 
+	/**
+	 * Sets the current board state in the game.
+	 * @param board	Any valid Board object.
+	 */
 	public void setBoard(Board board) {
 		this.board = board;
 	}
 
+	/**
+	 * Returns the current board state in the game.
+	 * @return	A Board containing the game state as of the time the method was called.
+	 */
 	public Board getBoard() {
 		return this.board;
 	}
 
+	/**
+	 * Returns an integer to denote the current player.
+	 * @return	1 or -1 to represent player 1 or player 2, respectively.
+	 */
 	public int getCurrentPlayer() {
 		return this.currentPlayer;
 	}
 
+	/**
+	 * Returns the number of turns that have passed since the start of the game.
+	 * Primarily used as a sort of server to ensure that any multithreaded processes are up to date.
+	 * @return	An integer representing the number of turns that both players have had since the start of the game.
+	 */
 	public int getTurnCount() {
 		return this.internalTurnCount;
 	}
 
+	/**
+	 * Returns the current computer difficulty set in the game.
+	 * @return	An integer from 0 to 3 showing the currently-set difficulty, increasing in ascending order.
+	 */
 	public int getDifficulty() {
 		return this.cpuDifficulty;
 	}
 
+	/**
+	 * Returns whether the action lock is in place.
+	 * The action lock causes all actions that would normally fire events to GameWindow's event handler to be disabled while it is active.
+	 * @return	A boolean value representing whether the action lock is activated.
+	 */
 	public boolean getLock() {
 		return this.actionLock;
 	}
 
+	/**
+	 * Sends a simulated mouse press in the column of the passed integer.
+	 * Usually causes the current player to send a chip down that column, if possible.
+	 * @param col	The column that the mouse press should be sent to.
+	 */
 	public void sendClick(int col) {
 		buttonGrid[0][col].doClick();
 	}
 
+	/**
+	 * Enables/disables the action lock.
+	 * Toggling this value also toggles the state of the save and quit button. It will be disabled when the action lock is enabled.
+	 */
 	public void toggleLock() {
 		this.actionLock = !this.actionLock;
 		this.headerButtons[0].setEnabled(!this.actionLock);

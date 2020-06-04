@@ -2,8 +2,6 @@
 // 13 May 2020
 // main window for user interaction
 
-// TODO: consider javadoc since maybe that'll give more marks
-
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

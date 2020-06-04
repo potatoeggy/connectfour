@@ -14,6 +14,10 @@ public class MainMenu extends JPanel {
 	private JLabel title; // label at top as a header
 	JButton[] buttons; // interactable buttons
 
+	/**
+	 * Creates a simple menu with three buttons to allow the user to navigate through the game configuration.
+	 * @param eventHandler	The global event handler to which all actions that involve other panels are passed to.
+	 */
 	public MainMenu(ActionListener eventHandler) {
 		title = new JLabel("Connect 4");
 		buttons = new JButton[] {new JButton("New game"), new JButton("Load game"), new JButton("Exit")};
