@@ -2,22 +2,13 @@
 // 28 May 2020
 // The bulk of the annoying stuff to do
 
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.Font;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
-import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 public class GameWindow extends JPanel implements ActionListener {
 	private final JPanel header;
@@ -33,17 +24,18 @@ public class GameWindow extends JPanel implements ActionListener {
 	private boolean gameOver;
 
 	// internal game variables copied from MainWindow
-	private Board board; // internal board
-	private int currentPlayer, cpuDifficulty;
+	protected Board board; // internal board
+	protected int currentPlayer, cpuDifficulty;
 	private int[] players; // actually it means player *types*
 	private String[] names;
 	private int internalTurnCount;
-	private int buttonsFilled; // when at top the game is a tie
-	private boolean actionLock; // make things feel more responsive
+	protected int buttonsFilled; // when at top the game is a tie
+	protected boolean actionLock; // make things feel more responsive
 
 	/**
 	 * Creates a new game panel, with options set by default to allow for simple gameplay out of the box.
-	 * @param eventHandler	The event handler that all actions that involve other panels are passed to.
+	 *
+	 * @param eventHandler The event handler that all actions that involve other panels are passed to.
 	 */
 	public GameWindow(ActionListener eventHandler) {
 		legacyGraphics = false;

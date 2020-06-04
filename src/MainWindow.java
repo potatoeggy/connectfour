@@ -2,15 +2,14 @@
 // 13 May 2020
 // main window for user interaction
 
-import java.awt.Color;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.UIManager;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.Scanner;
 
 public class MainWindow extends JFrame implements ActionListener {
 	// grab all the panels
@@ -182,5 +181,45 @@ public class MainWindow extends JFrame implements ActionListener {
 				win.moveTimerInternal = win.moveTimerFull;
 			}
 		}
+	}
+
+	public void saveGame() throws FileNotFoundException {
+		PrintWriter printWriter = new PrintWriter("savedGame.txt");
+
+		//saves the board state
+		for (int i = 0; i < gameWindow.board.H; i++) {
+			for (int j = 0; j < gameWindow.board.W; j++) {
+				printWriter.print(gameWindow.board.board[i][j] + " ");
+			}
+			printWriter.println();
+		}
+
+		printWriter.print(gameWindow.currentPlayer + " " + cpuDifficulty);
+
+		for (int i : players) printWriter.print(i + " ");
+		printWriter.println();
+		for (String string : names) printWriter.print(string + " ");
+		printWriter.println();
+
+		printWriter.print(internalTurnCount + " " + gameWindow.buttonsFilled + " " + gameWindow.actionLock);
+	}
+
+	public void retrieveSave() throws FileNotFoundException {
+		File file = new File("savedGame.txt");
+		Scanner input = new Scanner(file);
+		for (int i = 0; i < gameWindow.board.H; i++) {
+			for (int j = 0; j < gameWindow.board.W; j++) {
+				gameWindow.board.board[i][j] = input.nextInt();
+			}
+			input.nextLine();
+		}
+		gameWindow.currentPlayer = input.nextInt();
+		cpuDifficulty = input.nextInt();
+		players = new int[]{input.nextInt(), input.nextInt()};
+		input.nextLine();
+		names = new String[]{input.next(), input.next()};
+		internalTurnCount = input.nextInt();
+		gameWindow.buttonsFilled = input.nextInt();
+		gameWindow.actionLock = input.nextBoolean();
 	}
 }
