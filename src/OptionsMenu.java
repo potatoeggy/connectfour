@@ -38,7 +38,7 @@ public class OptionsMenu extends JPanel implements ActionListener { // how do di
 			"Easy",
 			"Normal",
 			"Hard",
-			"Impossible"
+			"Very hard"
 		}) {
 			difficultySelect.addItem(s);
 		}
@@ -100,6 +100,10 @@ public class OptionsMenu extends JPanel implements ActionListener { // how do di
 		return difficultySelect.getSelectedIndex();
 	}
 
+	public void setDifficulty(int index) {
+		difficultySelect.setSelectedIndex(index);
+	}
+
 	/**
 	 * Returns the current move timer length set in the options menu.
 	 * The user-selected item in the combo box is converted to an integer if the move timer is enabled.
@@ -107,5 +111,17 @@ public class OptionsMenu extends JPanel implements ActionListener { // how do di
 	 */
 	public int getTimer() {
 		return moveTimerEnabler.isSelected() ? Integer.parseInt(((String) moveTimerSelect.getSelectedItem()).substring(0, 2).trim()) + 1: -1; // returns it in seconds by parsing menu item
+	}
+
+	/**
+	 * Sets the current move timer settings in the options menu.
+	 * The checkbox and combobox are selected/enabled based on the parameter passed. The text inside the combobox is set to the parameter passed, if possible.
+	 * @param enabled	A boolean value to determine whether the check box will be selected and the combo box enabled.
+	 * @param seconds	An integer value to determine the selected item in the combo box, in seconds.
+	 */
+	public void setTimer(boolean enabled, int seconds) {
+		moveTimerEnabler.setSelected(enabled);
+		moveTimerSelect.setEnabled(enabled);
+		moveTimerSelect.setSelectedItem(seconds + " seconds");
 	}
 }

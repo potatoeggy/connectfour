@@ -2,14 +2,18 @@
 // 13 May 2020
 // main window for user interaction
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.Scanner;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 public class MainWindow extends JFrame implements ActionListener {
 	// grab all the panels
@@ -64,6 +68,13 @@ public class MainWindow extends JFrame implements ActionListener {
 
 	private void transition(JPanel toAdd) { // enables panels
 		// make things appear
+		if (toAdd.equals(mainMenu)) {
+			if (new File("savedGame.txt").exists()) {
+				mainMenu.enableLoad();
+			} else {
+				mainMenu.disableLoad();
+			}
+		}
 		toAdd.setVisible(true);
 		pack();
 	}
@@ -79,8 +90,9 @@ public class MainWindow extends JFrame implements ActionListener {
 		if (e.equals(mainMenu.buttons[0])) {
 			transition(mainMenu, newGameMenu);
 		} else if (e.equals(mainMenu.buttons[1])) {
-			// TODO: import board settings
-			transition(mainMenu, gameWindow);
+			if (retrieveSave()) {
+				transition(mainMenu, gameWindow);
+			}
 		} else if (e.equals(mainMenu.buttons[2])) {
 			dispose(); // exit and quit the program
 		}
@@ -96,7 +108,6 @@ public class MainWindow extends JFrame implements ActionListener {
 			gameWindow.setNames(names);
 			gameWindow.setPlayers(players);
 			gameWindow.setTimer(moveTimerInternal);
-			gameWindow.setDifficulty(cpuDifficulty);
 			if (players[0] == 1) gameWindow.cpuInit();
 			add(gameWindow);
 			transition(newGameMenu, gameWindow);
@@ -120,14 +131,17 @@ public class MainWindow extends JFrame implements ActionListener {
 
 		// game window interactions
 		else if (e.equals(gameWindow.optionsButton)) {
-			gameWindow.setDifficulty(cpuDifficulty);
 			optionsToNew = false;
 			transition(gameWindow, optionsMenu);
 		} else if (e.equals(gameWindow.headerButtons[0])) {
 			if (!gameWindow.isGameOver()) {
-				// TODO: save
+				if (saveGame()) {
+					dispose();
+				}
+				System.exit(0);
+			} else {
+				dispose();
 			}
-			dispose();
 		} else if (e.equals(gameWindow.headerButtons[1])) {
 			transition(gameWindow, newGameMenu);
 		}
@@ -151,14 +165,14 @@ public class MainWindow extends JFrame implements ActionListener {
 			Thread.sleep(1); // really stupid workaround because for whatever reason we don't enter the next loop sometimes
 			while (win.gameWindow.isVisible() && !win.gameWindow.isGameOver()) { // do not run timer when game is not ongoing
 				if (win.gameWindow.getLock()) { // if event thread is waiting for ai calculation
-					int col = AI.bestColumn(win.gameWindow.getBoard(), win.gameWindow.getDifficulty()); // calculate in different thread so we don't hang the main event thread
+					int col = AI.bestColumn(win.gameWindow.getBoard(), win.cpuDifficulty); // calculate in different thread so we don't hang the main event thread
 					win.gameWindow.toggleLock(); // disable lock
 					win.gameWindow.toggleAllButtons();
 					win.gameWindow.sendClick(col); // send click
 					responseTimer = 0;
 				}
 				
-				if (currentPlayer != win.gameWindow.getCurrentPlayer() || win.internalTurnCount != win.gameWindow.getTurnCount()) { // players have switched, reset timer
+				if (currentPlayer != win.gameWindow.getCurrentPlayer() || win.internalTurnCount != win.gameWindow.getBoardHistory().length()) { // players have switched, reset timer
 					currentPlayer = win.gameWindow.getCurrentPlayer();
 					win.moveTimerInternal = win.moveTimerFull;
 					responseTimer = 0;
@@ -173,7 +187,7 @@ public class MainWindow extends JFrame implements ActionListener {
 					}
 					responseTimer = 0;
 				}
-				win.internalTurnCount = win.gameWindow.getTurnCount();
+				win.internalTurnCount = win.gameWindow.getBoardHistory().length();
 				Thread.sleep(200);
 				responseTimer++;
 			}
@@ -183,43 +197,57 @@ public class MainWindow extends JFrame implements ActionListener {
 		}
 	}
 
-	public void saveGame() throws FileNotFoundException {
-		PrintWriter printWriter = new PrintWriter("savedGame.txt");
-
-		//saves the board state
-		for (int i = 0; i < gameWindow.board.H; i++) {
-			for (int j = 0; j < gameWindow.board.W; j++) {
-				printWriter.print(gameWindow.board.board[i][j] + " ");
-			}
+	/**
+	 * Saves the game to <code>savedGame.txt</code>.
+	 * If the file cannot be successfully written to, nothing will happen.
+	 * @return	A boolean denoting whether saving was successful.
+	 */
+	public boolean saveGame() {
+		try {
+			PrintWriter printWriter = new PrintWriter("savedGame.txt");
+			for (int i : players) printWriter.print(i + " "); // write player types
 			printWriter.println();
+			for (String string : names) printWriter.println(string); // write player names
+			printWriter.println(gameWindow.getBoardHistory()); // write board state
+			for (int i : new int[] {gameWindow.getCurrentPlayer(),
+									cpuDifficulty, moveTimerInternal, moveTimerFull}) {
+				printWriter.println(i); // write the rest of the internal variables
+			}
+			printWriter.close();
+		} catch (Exception e) {
+			System.err.println("Save failed.");
+			e.printStackTrace();
+			return false; // saving was unsuccessful
 		}
-
-		printWriter.print(gameWindow.currentPlayer + " " + cpuDifficulty);
-
-		for (int i : players) printWriter.print(i + " ");
-		printWriter.println();
-		for (String string : names) printWriter.print(string + " ");
-		printWriter.println();
-
-		printWriter.print(internalTurnCount + " " + gameWindow.buttonsFilled + " " + gameWindow.actionLock);
+		return true; // saving was successful
 	}
 
-	public void retrieveSave() throws FileNotFoundException {
-		File file = new File("savedGame.txt");
-		Scanner input = new Scanner(file);
-		for (int i = 0; i < gameWindow.board.H; i++) {
-			for (int j = 0; j < gameWindow.board.W; j++) {
-				gameWindow.board.board[i][j] = input.nextInt();
-			}
+	/**
+	 * Loads game data to MainWindow and GameWindow.
+	 * GameWindow's required data is pushed to it via its own load method. If the file cannot be successfully read, data up to the point of failure will be written internally.
+	 * @return	A boolean denoting whether loading was successful.
+	 */
+	public boolean retrieveSave() {
+		try {
+			Scanner input = new Scanner(new File("savedGame.txt"));
+			players = new int[]{input.nextInt(), input.nextInt()}; // read player types
 			input.nextLine();
+			names = new String[] {input.nextLine(), input.nextLine()}; // read player names
+			gameWindow.loadGame(input.nextLine(), players, names, input.nextInt()); // read and send internal variables for GameWindow
+			cpuDifficulty = input.nextInt();
+			moveTimerInternal = input.nextInt();
+			moveTimerFull = input.nextInt();
+			internalTurnCount = gameWindow.getBoardHistory().length();
+			input.close();
+
+			// set gui status of options menu
+			optionsMenu.setDifficulty(cpuDifficulty);
+			optionsMenu.setTimer(moveTimerFull != -1, moveTimerFull-1);
+		} catch (Exception ex) {
+			System.err.println("Load failed.");
+			ex.printStackTrace();
+			return false; // load was unsuccessful
 		}
-		gameWindow.currentPlayer = input.nextInt();
-		cpuDifficulty = input.nextInt();
-		players = new int[]{input.nextInt(), input.nextInt()};
-		input.nextLine();
-		names = new String[]{input.next(), input.next()};
-		internalTurnCount = input.nextInt();
-		gameWindow.buttonsFilled = input.nextInt();
-		gameWindow.actionLock = input.nextBoolean();
+		return true; // load was successful
 	}
 }
