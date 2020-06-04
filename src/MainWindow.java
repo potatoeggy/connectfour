@@ -227,7 +227,7 @@ public class MainWindow extends JFrame implements ActionListener {
 			input.close();
 
 			optionsMenu.setDifficulty(cpuDifficulty);
-			optionsMenu.setTimer(moveTimerFull == -1, moveTimerFull);
+			optionsMenu.setTimer(moveTimerFull != -1, moveTimerFull);
 		} catch (Exception ex) {
 			System.err.println("Load failed.");
 			ex.printStackTrace();
