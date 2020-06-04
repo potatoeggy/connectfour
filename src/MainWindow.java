@@ -216,7 +216,7 @@ public class MainWindow extends JFrame implements ActionListener {
 
 	public boolean retrieveSave() {
 		try {
-			Scanner input = new Scanner("savedGame.txt");
+			Scanner input = new Scanner(new File("savedGame.txt"));
 			players = new int[]{input.nextInt(), input.nextInt()};
 			input.nextLine();
 			names = new String[] {input.nextLine(), input.nextLine()};
