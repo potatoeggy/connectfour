@@ -28,24 +28,11 @@ class coordinate implements Comparable<coordinate> {
 
 public class AI {
 
+	final static boolean abPruning = true;
 	static Board b = new Board();
 
 	static int scoreGen(int[][] board) {
 		b.board = board;
-
-		//checks all chips if there is a win
-		for (int i = b.H - 1; i >= 0; i--) {
-			for (int j = 0; j < b.W; j++) {
-				if (board[i][j] == 0) continue; //if position empty - continue
-				if (b.checkWin(i, j, 1)) { //if this is a winning move
-					//System.out.println("AI WIN");
-					return Integer.MAX_VALUE - 1; //if AI wins
-				} else if (b.checkWin(i, j, 2)) {
-					//System.out.println("PLAYER WIN");
-					return Integer.MIN_VALUE + 1; //if player wins
-				}
-			}
-		}
 
 		//counts the largest amount of consecutive chips for each player
 		int ai = 0, p = 0, rowSize = 0;
@@ -162,6 +149,14 @@ public class AI {
 			//recur until depth is 0
 			if (depth != 0) {
 				if (player == 2) { //AI - find largest value
+					//check if this position already gives a win
+					if (b.checkWin(x, i, 2)) {
+						ans.add(Integer.MIN_VALUE);
+						if (abPruning)
+							beta = Integer.MIN_VALUE;
+						continue;
+					}
+
 					value.addAll(minMax(b, depth - 1, 1, alpha, beta));
 
 					int max = Integer.MIN_VALUE;
@@ -171,9 +166,18 @@ public class AI {
 
 					ans.add(max);
 					//System.out.println(max + "!");
-					//alpha = Math.max(alpha, max);
+					if (abPruning)
+						beta = Math.min(beta, max);
 
 				} else { //Player - find smallest value
+					//check if this position already gives a win
+					if (b.checkWin(x, i, 1)) {
+						ans.add(Integer.MAX_VALUE);
+						if (abPruning)
+							alpha = Integer.MAX_VALUE;
+						continue;
+					}
+
 					value.addAll(minMax(b, depth - 1, 2, alpha, beta));
 
 					int min = Integer.MAX_VALUE;
@@ -183,17 +187,19 @@ public class AI {
 
 					ans.add(min);
 					//System.out.println(min + "?");
-					//beta = Math.min(beta, min);
+					if (abPruning)
+						alpha = Math.max(alpha, min);
 				}
 
 				//Alpha-Beta pruning
-				if (beta <= alpha) {
-					//System.out.println("Pruned" + depth + " " + alpha + " " + beta);
+				if (abPruning && beta <= alpha) {
+					System.out.println("Pruned" + depth + " " + alpha + " " + beta);
 					break;
 				}
 
 			} else { //generate score for moves
-				ans.add(scoreGen(b.board));
+				if (b.checkWin(x, i, player)) ans.add(player == 1 ? Integer.MAX_VALUE : Integer.MIN_VALUE);
+				else ans.add(scoreGen(b.board));
 				//System.out.println(ans.get(ans.size()-1)); //debug
 			}
 
@@ -226,7 +232,7 @@ public class AI {
 				i--;
 				continue;
 			}
-			if (bestRows.get(i) > bestScore) {
+			if (bestRows.get(i) >= bestScore) {
 				bestScore = bestRows.get(i);
 				bestIndex = col;
 			}
