@@ -224,6 +224,7 @@ public class MainWindow extends JFrame implements ActionListener {
 			cpuDifficulty = input.nextInt();
 			moveTimerInternal = input.nextInt();
 			moveTimerFull = input.nextInt();
+			internalTurnCount = gameWindow.getBoardHistory().length();
 			input.close();
 
 			optionsMenu.setDifficulty(cpuDifficulty);
