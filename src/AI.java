@@ -193,7 +193,7 @@ public class AI {
 
 				//Alpha-Beta pruning
 				if (abPruning && beta <= alpha) {
-					System.out.println("Pruned" + depth + " " + alpha + " " + beta);
+					//System.out.println("Pruned" + depth + " " + alpha + " " + beta);
 					break;
 				}
 
