@@ -54,6 +54,7 @@ public class NewGameMenu extends JPanel {
 				playerBox.add(c);
 			}
 		}
+		playerSelect[1].setEnabled(false); // only allow computers to go first
 
 		// provide options for user to play against
 		for (String s : new String[] {"Human", "Computer"}) {
