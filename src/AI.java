@@ -55,7 +55,6 @@ public class AI {
 
 		//array to keep track of which rows are already counted
 		ArrayList<Integer[]> foundRows = new ArrayList<>();
-		int xStart, yStart; // TODO: remove these variables since vscode says they are unused
 
 		//variable to keep count of score for chips closer to center
 		int placementScore = 0;
@@ -97,6 +96,8 @@ public class AI {
 						}
 					}
 
+					//if row is not counted then record in found rows
+					// and add to AI or player's score
 					if (!found) {
 						foundRows.add(beginEnd);
 						if (color == 1) ai++;
@@ -184,7 +185,6 @@ public class AI {
 
 
 					ans.put(value.descendingMap().firstEntry().getKey(), i);
-					//System.out.println(max + "!");
 					if (abPruning)
 						beta = Math.min(beta, value.descendingMap().firstEntry().getKey());
 
@@ -201,20 +201,18 @@ public class AI {
 
 
 					ans.put(value.firstEntry().getKey(), i);
-					//System.out.println(min + "?");
 					if (abPruning)
 						alpha = Math.max(alpha, value.firstEntry().getKey());
 				}
 
 				//Alpha-Beta pruning
-				if (abPruning && beta <= alpha) { // TODO: remove debug statements
+				if (abPruning && beta <= alpha) {
 					break;
 				}
 
 			} else { //generate score for moves
 				if (b.checkWin(x, i, player)) ans.put(player == 1 ? Integer.MAX_VALUE : Integer.MIN_VALUE, i);
 				else ans.put(scoreGen(b.board), i);
-				//System.out.println(ans.get(ans.size()-1)); //debug
 			}
 
 		}
@@ -223,7 +221,6 @@ public class AI {
 
 	/**
 	 * utility function to act as a stable interface between Ai and gui
-	 *
 	 * @param board      current board state
 	 * @param difficulty AI difficulty chosen by player
 	 * @return returns an Integer corresponding to the AI's chosen column
@@ -244,16 +241,20 @@ public class AI {
 		} else {
 			depth = 3;
 		}
-		TreeMap<Integer, Integer> bestRows = minMax(board, depth, 1, Integer.MIN_VALUE, Integer.MAX_VALUE); // grab value from big algorithm
 
-		System.out.println(bestRows.descendingMap());
-
-		return bestRows.descendingMap().firstEntry().getValue(); // return to gui
+		// grab value from big algorithm and return to GUI
+		return minMax(board,
+				depth,
+				1,
+				Integer.MIN_VALUE,
+				Integer.MAX_VALUE)
+				.descendingMap()
+				.firstEntry()
+				.getValue();
 	}
 
 	/**
 	 * utility function to find next empty position in a column
-	 *
 	 * @param board current board state
 	 * @param col   chosen column
 	 * @return returns an integer corresponding to the next empty row in the given column
