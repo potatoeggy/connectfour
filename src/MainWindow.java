@@ -31,10 +31,14 @@ public class MainWindow extends JFrame implements ActionListener {
 	private int moveTimerFull; // what to reset timer to
 	private int internalTurnCount; // not shown to user, used to enforce move timer
 
+	private boolean verboseHistory;
+
 	/**
 	 * Creates the master object to handle all other objects.
+	 * @param verboseHistory	Whether board history should be printed at the end of a game.
 	 */
-	public MainWindow() {
+	public MainWindow(boolean verboseHistory) {
+		this.verboseHistory = verboseHistory;
 		// initialising internal variables
 		cpuDifficulty = 1;
 		moveTimerInternal = -1;
@@ -46,7 +50,7 @@ public class MainWindow extends JFrame implements ActionListener {
 		newGameMenu = new NewGameMenu(this);
 		mainMenu = new MainMenu(this);
 		optionsMenu = new OptionsMenu(this);
-		gameWindow = new GameWindow(this);
+		gameWindow = new GameWindow(this, verboseHistory);
 
 		for (JPanel pan : new JPanel[] {newGameMenu, mainMenu, optionsMenu, gameWindow}) {
 			add(pan); // add panels to frame even if they're hidden so we can control them later
@@ -101,7 +105,7 @@ public class MainWindow extends JFrame implements ActionListener {
 		else if (e.equals(newGameMenu.buttons[0])) {
 			names = newGameMenu.getNames();
 			players = newGameMenu.getPlayers();
-			gameWindow = new GameWindow(this);
+			gameWindow = new GameWindow(this, verboseHistory);
 			AI.reset(); // it's not an object so we have to call something
 
 			// pass information from new game and options, if configured
@@ -148,6 +152,7 @@ public class MainWindow extends JFrame implements ActionListener {
 	}
 
 	public static void main(String[] args) throws InterruptedException {
+		if (args.length > 0 && args[0].equals("verbose")) System.out.println("[DEBUG] Board history printing enabled.");
 		for (String s : new String[] {
 			"Label",
 			"Button",
@@ -156,7 +161,7 @@ public class MainWindow extends JFrame implements ActionListener {
 		}) {
 			UIManager.getLookAndFeelDefaults().put(s + ".background", Color.WHITE); // change default to make pretty
 		}
-		MainWindow win = new MainWindow();
+		MainWindow win = new MainWindow(args.length > 0 && args[0].equals("--verbose"));
 		win.setVisible(true);
 
 		while (win.isVisible()) { // exit when window is closed

@@ -40,12 +40,16 @@ public class GameWindow extends JPanel implements ActionListener {
 	private String[] names;
 	private boolean actionLock; // make things feel more responsive
 
+	private boolean verboseHistory; // whether game history should be printed at the end of a game
+
 	/**
 	 * Creates a new game panel, with options set by default to allow for simple gameplay out of the box.
 	 *
 	 * @param eventHandler The event handler that all actions that involve other panels are passed to.
+	 * @param verboseHistory	Whether board history should be printed at the end of a game. Mostly used for debugging purposes.
 	 */
-	public GameWindow(ActionListener eventHandler) {
+	public GameWindow(ActionListener eventHandler, boolean verboseHistory) {
+		this.verboseHistory = verboseHistory;
 		legacyGraphics = false;
 		gameOver = false;
 		board = new Board();
@@ -226,6 +230,7 @@ public class GameWindow extends JPanel implements ActionListener {
 		}
 		gameStatus.setBackground(null); // remove colour because it's no-one's turn
 		gameOver = true;
+		if (verboseHistory) System.out.println(loadBoard);
 	}
 
 	/**
