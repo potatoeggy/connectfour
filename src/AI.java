@@ -38,7 +38,7 @@ public class AI {
 
 		//array to keep track of which rows are already counted
 		ArrayList<Integer[]> foundRows = new ArrayList<>();
-		int xStart, yStart;
+		int xStart, yStart; // TODO: remove these variables since vscode says they are unused
 
 		//variable to keep count of score for chips closer to center
 		int placementScore = 0;
@@ -179,7 +179,7 @@ public class AI {
 
 					value = minMax(b, depth - 1, 2, alpha, beta);
 
-					int min = Integer.MAX_VALUE, index = -1;
+					int min = Integer.MAX_VALUE, index = -1; // TODO: vscode says index is not used
 					for (Map.Entry<Integer, Integer> j : value.entrySet()) {
 						min = Math.min(min, j.getValue());
 						if (j.getValue() == min) index = i;
@@ -192,7 +192,7 @@ public class AI {
 				}
 
 				//Alpha-Beta pruning
-				if (abPruning && beta <= alpha) {
+				if (abPruning && beta <= alpha) { // TODO: remove debug statements
 					//System.out.println("Pruned" + depth + " " + alpha + " " + beta);
 					break;
 				}
@@ -238,8 +238,6 @@ public class AI {
 				bestIndex = i.getKey();
 			}
 		}
-		System.out.println();
-		if (bestIndex == -1) System.out.println("Can't find an empty column");
 		return bestIndex; // return to gui
 	}
 
