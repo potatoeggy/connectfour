@@ -126,8 +126,10 @@ public class GameWindow extends JPanel implements ActionListener {
 		}
 
 		for (int i = 0; i < buttonGrid[0].length; i++) {
-			buttonGrid[0][i].setBorder(BorderFactory.createMatteBorder(0, 0, 0, 0, Color.WHITE)); // make top open-ended
+			buttonGrid[0][i].setBorder(null); // this is not part of the grid it is for arrows
 			buttonGrid[0][i].setText(null);
+
+			buttonGrid[1][i].setBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, Color.BLACK)); // make top open-ended
 		}
 
 		add(header);
