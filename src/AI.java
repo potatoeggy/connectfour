@@ -5,7 +5,6 @@ import java.util.TreeMap;
 
 /**
  * A class to store all needed values for AI.scoreGen
- *
  * @see AI
  */
 class coordinate implements Comparable<coordinate> {
