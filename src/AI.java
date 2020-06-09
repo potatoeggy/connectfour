@@ -221,11 +221,11 @@ public class AI {
 			}
 			return temp;
 		} else if (difficulty == 1) { // modify depth based on current difficulty
-			depth = 2;
+			depth = 1;
 		} else if (difficulty == 2) {
-			depth = 3;
+			depth = 2;
 		} else {
-			depth = 4;
+			depth = 3;
 		}
 		TreeMap<Integer, Integer> bestRows = minMax(board, depth, 1, Integer.MIN_VALUE, Integer.MAX_VALUE); // grab value from big algorithm
 
