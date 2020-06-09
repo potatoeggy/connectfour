@@ -1,6 +1,4 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.PriorityQueue;
+import java.util.*;
 
 class coordinate implements Comparable<coordinate> {
 	int x, y, color, rowSize, xBegin, yBegin,
@@ -28,7 +26,7 @@ class coordinate implements Comparable<coordinate> {
 
 public class AI {
 
-	final static boolean abPruning = true;
+	final static boolean abPruning = false;
 	static Board b = new Board();
 
 	static int scoreGen(int[][] board) {
@@ -118,7 +116,7 @@ public class AI {
 					}
 				}
 			}
-      
+
 			for (int j = 5; j >= 0; j--) {
 				if (board[j][i] == 0) break;
 				if (board[j][i] == 1) placementScore += 4 - Math.abs(3 - i);
@@ -129,12 +127,12 @@ public class AI {
 		return (rowSize * (ai - p)) * 2 + placementScore;
 	}
 
-	static ArrayList<Integer> minMax(Board board, int depth, int player, int alpha, int beta) {
-		ArrayList<Integer> ans = new ArrayList<>(); //best answer for current player
+	static TreeMap<Integer, Integer> minMax(Board board, int depth, int player, int alpha, int beta) {
+		TreeMap<Integer, Integer> ans = new TreeMap<>(); //best answer for current player
 		for (int i = 0; i < board.W; i++) {
 
 			Board b = new Board(); //copy of board
-			ArrayList<Integer> value = new ArrayList<>(); //value of each move
+			TreeMap<Integer, Integer> value = new TreeMap<>(); //value of each move
 
 			b.board = new int[b.H][b.W];
 			for (int j = 0; j < b.H; j++) b.board[j] = Arrays.copyOf(board.board[j], b.W);
@@ -151,20 +149,21 @@ public class AI {
 				if (player == 2) { //AI - find largest value
 					//check if this position already gives a win
 					if (b.checkWin(x, i, 2)) {
-						ans.add(Integer.MIN_VALUE);
+						ans.put(i, Integer.MIN_VALUE);
 						if (abPruning)
 							beta = Integer.MIN_VALUE;
 						continue;
 					}
 
-					value.addAll(minMax(b, depth - 1, 1, alpha, beta));
+					value = minMax(b, depth - 1, 1, alpha, beta);
 
-					int max = Integer.MIN_VALUE;
-					for (int j : value) {
-						max = Math.max(max, j);
+					int max = Integer.MIN_VALUE, index = -1;
+					for (Map.Entry<Integer, Integer> j : value.entrySet()) {
+						max = Math.max(max, j.getValue());
+						if (max == j.getValue()) index = i;
 					}
 
-					ans.add(max);
+					ans.put(index, max);
 					//System.out.println(max + "!");
 					if (abPruning)
 						beta = Math.min(beta, max);
@@ -172,20 +171,21 @@ public class AI {
 				} else { //Player - find smallest value
 					//check if this position already gives a win
 					if (b.checkWin(x, i, 1)) {
-						ans.add(Integer.MAX_VALUE);
+						ans.put(i, Integer.MAX_VALUE);
 						if (abPruning)
 							alpha = Integer.MAX_VALUE;
 						continue;
 					}
 
-					value.addAll(minMax(b, depth - 1, 2, alpha, beta));
+					value = minMax(b, depth - 1, 2, alpha, beta);
 
-					int min = Integer.MAX_VALUE;
-					for (int j : value) {
-						min = Math.min(min, j);
+					int min = Integer.MAX_VALUE, index = -1;
+					for (Map.Entry<Integer, Integer> j : value.entrySet()) {
+						min = Math.min(min, j.getValue());
+						if (j.getValue() == min) index = i;
 					}
 
-					ans.add(min);
+					ans.put(i, min);
 					//System.out.println(min + "?");
 					if (abPruning)
 						alpha = Math.max(alpha, min);
@@ -198,8 +198,8 @@ public class AI {
 				}
 
 			} else { //generate score for moves
-				if (b.checkWin(x, i, player)) ans.add(player == 1 ? Integer.MAX_VALUE : Integer.MIN_VALUE);
-				else ans.add(scoreGen(b.board));
+				if (b.checkWin(x, i, player)) ans.put(i, player == 1 ? Integer.MAX_VALUE : Integer.MIN_VALUE);
+				else ans.put(i, scoreGen(b.board));
 				//System.out.println(ans.get(ans.size()-1)); //debug
 			}
 
@@ -227,21 +227,19 @@ public class AI {
 		} else {
 			depth = 4;
 		}
-		ArrayList<Integer> bestRows = minMax(board, depth, 1, Integer.MIN_VALUE, Integer.MAX_VALUE); // grab value from big algorithm
-		System.out.println(Arrays.toString(bestRows.toArray()));
+		TreeMap<Integer, Integer> bestRows = minMax(board, depth, 1, Integer.MIN_VALUE, Integer.MAX_VALUE); // grab value from big algorithm
+
 		bestIndex = 0;
 		bestScore = bestRows.get(0);
-		for (int i = 0, col = 0; i < bestRows.size() && i < board.W; i++, col++) { // iterate and find highest value
-			if (nextEmpty(board, col) == -1) {
-				i--;
-				continue;
-			}
-			if (bestRows.get(i) >= bestScore) {
-				bestScore = bestRows.get(i);
-				bestIndex = col;
+		for (Map.Entry<Integer, Integer> i : bestRows.entrySet()) { // iterate and find highest value
+			System.out.println(i.getKey() + " " + i.getValue());
+			if (i.getValue() >= bestScore) {
+				bestScore = i.getValue();
+				bestIndex = i.getKey();
 			}
 		}
-		if (bestIndex == -1) System.out.println(Arrays.toString(bestRows.toArray()));
+		System.out.println();
+		if (bestIndex == -1) System.out.println("Can't find an empty column");
 		return bestIndex; // return to gui
 	}
 
