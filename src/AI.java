@@ -107,8 +107,8 @@ public class AI {
 									q.add(new coordinate(curr.x + xM[j], curr.y + yM[j], color, 1, xM[j], yM[j], curr.x + xM[j], curr.y + yM[j], startBlocked(curr.x + xM[j], curr.y + yM[j], xM[j], yM[j])));
 							}
 						}
-						//if there is a gap in the middle of a row
-						else if (curr.color < 3) {
+						//if there is a gap in the middle of a row and it still has not yet reached rowSize of 3
+						else if (curr.color < 3 && curr.rowSize != 3) {
 							boolean start = curr.startBlocked;
 							if (curr.yM == 0 && curr.xM == 0 && j == 0) { //if horizontal direction is unblocked
 								start = startBlocked(curr.x, curr.y, xM[j], yM[j]);
@@ -228,7 +228,7 @@ public class AI {
 			depth = 4;
 		}
 		ArrayList<Integer> bestRows = minMax(board, depth, 1, Integer.MIN_VALUE, Integer.MAX_VALUE); // grab value from big algorithm
-
+		System.out.println(Arrays.toString(bestRows.toArray()));
 		bestIndex = 0;
 		bestScore = bestRows.get(0);
 		for (int i = 0, col = 0; i < bestRows.size() && i < board.W; i++, col++) { // iterate and find highest value
