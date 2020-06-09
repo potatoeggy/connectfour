@@ -215,7 +215,11 @@ public class AI {
 		int bestIndex, bestScore;
 		int depth;
 		if (difficulty == 0) {
-			return (int) (Math.random() * 7); // it's incredibly easy
+			int temp = -1;
+			while (nextEmpty(board, temp) == -1) { // make sure we don't choose invalid squares
+				temp = (int) (Math.random() * 7);
+			}
+			return temp;
 		} else if (difficulty == 1) { // modify depth based on current difficulty
 			depth = 2;
 		} else if (difficulty == 2) {
