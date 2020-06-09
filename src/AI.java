@@ -5,53 +5,71 @@ import java.util.TreeMap;
 
 /**
  * A class to store all needed values for AI.scoreGen
- * @see AI
+ *
+ * @author Vincent
+ * @see AI for usage
  */
-class coordinate implements Comparable<coordinate> {
-	int x, y, color, rowSize, xBegin, yBegin,
-			xM, yM; //used to keep track which direction the row is
+class Coordinate implements Comparable<Coordinate> {
+	int x, y, //position on board
+			color, //the color of the current row
+			rowSize, //the size of the current row
+			xBegin, yBegin, //the start of the row
+			xMove, yMove; //used to keep track which direction the row is
+
 	boolean startBlocked; //if the starting end is blocked - false
 
-	coordinate(int x, int y, int color, int rowSize, int xM, int yM, int xBegin, int yBegin, boolean startBlocked) {
+	Coordinate(int x, int y,
+	           int color,
+	           int rowSize,
+	           int xMove, int yMove,
+	           int xBegin, int yBegin,
+	           boolean startBlocked) {
 		this.x = x;
 		this.y = y;
 		this.color = color;
 		this.rowSize = rowSize;
-		this.xM = xM;
-		this.yM = yM;
+		this.xMove = xMove;
+		this.yMove = yMove;
 		this.xBegin = xBegin;
 		this.yBegin = yBegin;
+
 		this.startBlocked = startBlocked;
 	}
 
-	@Override //sorted so it iterates through bottom left to top right - row by row
-	public int compareTo(coordinate o) {
+
+	@Override
+	//sorted so it iterates through bottom left to top right - row by row
+	public int compareTo(Coordinate o) {
 		if (this.x == o.x) return this.y - o.y;
 		return -1 * (this.x - o.x);
 	}
 }
 
 /**
- * @author Vincent
  * An AI that uses the Minimax algorithm to find the best move
+ *
+ * @author Vincent
  */
 public class AI {
 
-	final static boolean abPruning = false;
+	//alpha-beta pruning has been disable due to bugs in the AI
+	final static boolean AB_PRUNING = false;
 	static Board b = new Board();
 
 	/**
+	 * Generates a score for the current board state
+	 * large values mean AI advantage, smaller values mean player advantage
+	 *
 	 * @param board current board state
 	 * @return returns the value of this board state
-	 * - large values mean AI advantage, smaller values mean player advantage
-	 * @see coordinate
+	 * @see Coordinate an object used in this function
 	 */
 	static int scoreGen(int[][] board) {
 		b.board = board;
 
 		//counts the largest amount of consecutive chips for each player
 		int ai = 0, p = 0, rowSize = 0;
-		final int xM[] = {0, -1, -1, -1}, yM[] = {1, 0, 1, -1}; //directions
+		final int X_MOVE[] = {0, -1, -1, -1}, Y_MOVE[] = {1, 0, 1, -1}; //directions
 
 		//array to keep track of which rows are already counted
 		ArrayList<Integer[]> foundRows = new ArrayList<>();
@@ -60,35 +78,35 @@ public class AI {
 		int placementScore = 0;
 
 		for (int i = 0; i < b.W; i++) { //loops through all columns in case there is a gap
-			PriorityQueue<coordinate> q = new PriorityQueue<>();
+			PriorityQueue<Coordinate> q = new PriorityQueue<>();
 			if (board[b.H - 1][i] == 0) continue; //if this place is empty
 
 			//starting position
-			q.add(new coordinate(b.H - 1, i, board[b.H - 1][i], 1, 0, 0, 5, i, false));
+			q.add(new Coordinate(b.H - 1, i, board[b.H - 1][i], 1, 0, 0, 5, i, false));
 
 			while (!q.isEmpty()) {
-				coordinate curr = q.poll();
+				Coordinate currentNode = q.poll();
 
 				//find the actual color - if it's divisible by 10, then this is a gap
-				int color = (curr.color % 10) == 0 ? curr.color / 10 : curr.color;
+				int color = (currentNode.color % 10) == 0 ? currentNode.color / 10 : currentNode.color;
 
 				//ending is unblocked?
-				int trueRowSize = curr.startBlocked ? 1 : 0;
-				if (curr.x + curr.xM >= 0 && curr.x + curr.xM < b.H && curr.y + curr.yM >= 0 && curr.y + curr.yM < b.W && board[curr.x + curr.xM][curr.y + curr.yM] == 0) {
+				int trueRowSize = currentNode.startBlocked ? 1 : 0;
+				if (currentNode.x + currentNode.xMove >= 0 && currentNode.x + currentNode.xMove < b.H && currentNode.y + currentNode.yMove >= 0 && currentNode.y + currentNode.yMove < b.W && board[currentNode.x + currentNode.xMove][currentNode.y + currentNode.yMove] == 0) {
 					trueRowSize++;
 				}
-				trueRowSize = trueRowSize * curr.rowSize; //for each unblocked end in the row, multiply score
+				trueRowSize = trueRowSize * currentNode.rowSize; //for each unblocked end in the row, multiply score
 
 				//checks if the chip's rowSize is larger than the largest row size
-				if (trueRowSize > rowSize && curr.color < 3) {
+				if (trueRowSize > rowSize && currentNode.color < 3) {
 					ai = 0;
 					p = 0; //set their count to 0
 					rowSize = trueRowSize;
 				}
 				//or if it is equal to the largest row size
-				if (trueRowSize == rowSize && curr.color < 3) {
+				if (trueRowSize == rowSize && currentNode.color < 3) {
 					//checks if the row was already counted
-					Integer[] beginEnd = {curr.xBegin, curr.yBegin, curr.x, curr.y};
+					Integer[] beginEnd = {currentNode.xBegin, currentNode.yBegin, currentNode.x, currentNode.y};
 					boolean found = false;
 					for (Integer[] foundRow : foundRows) {
 						if (Arrays.deepEquals(foundRow, beginEnd)) {
@@ -106,30 +124,30 @@ public class AI {
 				}
 
 				for (int j = 0; j < 4; j++) { //loops through all 4 directions
-					if (curr.x + xM[j] >= 0 && curr.x + xM[j] < b.H && curr.y + yM[j] >= 0 && curr.y + yM[j] < b.W) {
-						if (board[curr.x + xM[j]][curr.y + yM[j]] != 0) { //if this position is not empty
-							if (color != board[curr.x + xM[j]][curr.y + yM[j]]) { //if it's a different color
-								q.add(new coordinate(curr.x + xM[j], curr.y + yM[j], board[curr.x + xM[j]][curr.y + yM[j]], 1, xM[j], yM[j], curr.x + xM[j], curr.y + yM[j], false));
+					if (currentNode.x + X_MOVE[j] >= 0 && currentNode.x + X_MOVE[j] < b.H && currentNode.y + Y_MOVE[j] >= 0 && currentNode.y + Y_MOVE[j] < b.W) {
+						if (board[currentNode.x + X_MOVE[j]][currentNode.y + Y_MOVE[j]] != 0) { //if this position is not empty
+							if (color != board[currentNode.x + X_MOVE[j]][currentNode.y + Y_MOVE[j]]) { //if it's a different color
+								q.add(new Coordinate(currentNode.x + X_MOVE[j], currentNode.y + Y_MOVE[j], board[currentNode.x + X_MOVE[j]][currentNode.y + Y_MOVE[j]], 1, X_MOVE[j], Y_MOVE[j], currentNode.x + X_MOVE[j], currentNode.y + Y_MOVE[j], false));
 							} else { //if it is the same color
 								//if the row direction is the same or if it came from the starting position
-								if ((xM[j] == curr.xM && yM[j] == curr.yM) || curr.yM == 0 && curr.xM == 0) {
-									boolean start = curr.startBlocked;
-									if (curr.yM == 0 && curr.xM == 0 && j == 0) { //if horizontal direction is unblocked
-										start = startBlocked(curr.x, curr.y, xM[j], yM[j]);
+								if ((X_MOVE[j] == currentNode.xMove && Y_MOVE[j] == currentNode.yMove) || currentNode.yMove == 0 && currentNode.xMove == 0) {
+									boolean start = currentNode.startBlocked;
+									if (currentNode.yMove == 0 && currentNode.xMove == 0 && j == 0) { //if horizontal direction is unblocked
+										start = startBlocked(currentNode.x, currentNode.y, X_MOVE[j], Y_MOVE[j]);
 									}
 
-									q.add(new coordinate(curr.x + xM[j], curr.y + yM[j], color, curr.rowSize + 1, xM[j], yM[j], curr.xBegin, curr.yBegin, start));
+									q.add(new Coordinate(currentNode.x + X_MOVE[j], currentNode.y + Y_MOVE[j], color, currentNode.rowSize + 1, X_MOVE[j], Y_MOVE[j], currentNode.xBegin, currentNode.yBegin, start));
 								} else  //direction not the same
-									q.add(new coordinate(curr.x + xM[j], curr.y + yM[j], color, 1, xM[j], yM[j], curr.x + xM[j], curr.y + yM[j], startBlocked(curr.x + xM[j], curr.y + yM[j], xM[j], yM[j])));
+									q.add(new Coordinate(currentNode.x + X_MOVE[j], currentNode.y + Y_MOVE[j], color, 1, X_MOVE[j], Y_MOVE[j], currentNode.x + X_MOVE[j], currentNode.y + Y_MOVE[j], startBlocked(currentNode.x + X_MOVE[j], currentNode.y + Y_MOVE[j], X_MOVE[j], Y_MOVE[j])));
 							}
 						}
 						//if there is a gap in the middle of a row and it still has not yet reached rowSize of 3
-						else if (curr.color < 3 && curr.rowSize != 3) {
-							boolean start = curr.startBlocked;
-							if (curr.yM == 0 && curr.xM == 0 && j == 0) { //if horizontal direction is unblocked
-								start = startBlocked(curr.x, curr.y, xM[j], yM[j]);
+						else if (currentNode.color < 3 && currentNode.rowSize != 3) {
+							boolean start = currentNode.startBlocked;
+							if (currentNode.yMove == 0 && currentNode.xMove == 0 && j == 0) { //if horizontal direction is unblocked
+								start = startBlocked(currentNode.x, currentNode.y, X_MOVE[j], Y_MOVE[j]);
 							}
-							q.add(new coordinate(curr.x + xM[j], curr.y + yM[j], color * 10, curr.rowSize, xM[j], yM[j], curr.xBegin, curr.yBegin, start));
+							q.add(new Coordinate(currentNode.x + X_MOVE[j], currentNode.y + Y_MOVE[j], color * 10, currentNode.rowSize, X_MOVE[j], Y_MOVE[j], currentNode.xBegin, currentNode.yBegin, start));
 						}
 					}
 				}
@@ -146,6 +164,8 @@ public class AI {
 	}
 
 	/**
+	 * A standard Minimax algorithm adapted to connect 4
+	 *
 	 * @param board  the current board state
 	 * @param depth  how many moves forward the AI should see
 	 * @param player minimizer or maximizer
@@ -176,7 +196,7 @@ public class AI {
 					//check if this position already gives a win
 					if (b.checkWin(x, i, 2)) {
 						ans.put(Integer.MIN_VALUE, i);
-						if (abPruning)
+						if (AB_PRUNING)
 							beta = Integer.MIN_VALUE;
 						continue;
 					}
@@ -185,14 +205,14 @@ public class AI {
 
 
 					ans.put(value.descendingMap().firstEntry().getKey(), i);
-					if (abPruning)
+					if (AB_PRUNING)
 						beta = Math.min(beta, value.descendingMap().firstEntry().getKey());
 
 				} else { //Player - find smallest value
 					//check if this position already gives a win
 					if (b.checkWin(x, i, 1)) {
 						ans.put(Integer.MAX_VALUE, i);
-						if (abPruning)
+						if (AB_PRUNING)
 							alpha = Integer.MAX_VALUE;
 						continue;
 					}
@@ -201,12 +221,12 @@ public class AI {
 
 
 					ans.put(value.firstEntry().getKey(), i);
-					if (abPruning)
+					if (AB_PRUNING)
 						alpha = Math.max(alpha, value.firstEntry().getKey());
 				}
 
 				//Alpha-Beta pruning
-				if (abPruning && beta <= alpha) {
+				if (AB_PRUNING && beta <= alpha) {
 					break;
 				}
 
@@ -220,11 +240,12 @@ public class AI {
 	}
 
 	/**
-	 * utility function to act as a stable interface between Ai and gui
+	 * utility function to act as a stable interface between AI and gui
+	 *
 	 * @param board      current board state
 	 * @param difficulty AI difficulty chosen by player
 	 * @return returns an Integer corresponding to the AI's chosen column
-	 * @see MainWindow
+	 * @see MainWindow for usage
 	 */
 	static int bestColumn(Board board, int difficulty) {
 		int depth;
@@ -255,6 +276,7 @@ public class AI {
 
 	/**
 	 * utility function to find next empty position in a column
+	 *
 	 * @param board current board state
 	 * @param col   chosen column
 	 * @return returns an integer corresponding to the next empty row in the given column
@@ -267,20 +289,22 @@ public class AI {
 	}
 
 	/**
-	 * @param x  chosen position's row
-	 * @param y  chosen position's column
-	 * @param xM direction of current row
-	 * @param yM direction of current row
+	 * utility function to check if the start of a row is blocked
+	 *
+	 * @param x     chosen position's row
+	 * @param y     chosen position's column
+	 * @param xMove direction of current row
+	 * @param yMove direction of current row
 	 * @return true if unblocked and false if blocked
 	 */
-	static boolean startBlocked(int x, int y, int xM, int yM) {
-		return x - xM >= 0 && x - xM < b.H && y - yM >= 0 && y - yM < b.W && b.board[x - xM][y - yM] == 0;
+	static boolean startBlocked(int x, int y, int xMove, int yMove) {
+		return x - xMove >= 0 && x - xMove < b.H && y - yMove >= 0 && y - yMove < b.W && b.board[x - xMove][y - yMove] == 0;
 	}
 
 	/**
 	 * utility function to reset the board. Used by the GUI.
 	 *
-	 * @see MainWindow
+	 * @see MainWindow for usage
 	 */
 	static void reset() {
 		b = new Board();
