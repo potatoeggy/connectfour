@@ -1,7 +1,7 @@
 # connectfour
 A re-implementation of the popular Connect 4 game in Java
 
-## Depedencies
+## Dependencies
  - JDK 8 (it probably works with Java 9-13 too, but that's untested)
  - (Optional) Git
 
